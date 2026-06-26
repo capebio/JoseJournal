@@ -1,0 +1,70 @@
+/* FE8 Profile / Identity / Certification — screen-specific bits the design system
+   doesn't already cover. Reuses jose-page/jose-card/jose-field/jose-btn/jose-badge;
+   --type-red appears ONLY on provenance/identity markers (record + cert ids). */
+
+.jp-grid { display: grid; grid-template-columns: 1fr; gap: 0; }
+
+/* ---- Identity header ---- */
+.jp-identity .jp-prompt { font-size: 13px; color: var(--sub); margin: 0; max-width: 60ch; line-height: 1.5; }
+.jp-id-row { display: flex; gap: 16px; align-items: flex-start; }
+.jp-avatar { width: 52px; height: 52px; border-radius: 10px; flex: none; display: flex; align-items: center; justify-content: center; font-family: var(--ui); font-weight: 700; font-size: 17px; letter-spacing: 0.04em; color: var(--paper); background: var(--structure); }
+.jp-avatar.a-verified { background: var(--verified); }
+.jp-avatar.a-certified { background: var(--verified); box-shadow: 0 0 0 3px var(--paper), 0 0 0 4px var(--verified); }
+.jp-id-body { min-width: 0; }
+.jp-id-name { font-size: 15px; color: var(--ink); }
+.jp-id-sub { font-size: 12px; color: var(--sub); margin: 3px 0 9px; }
+.jp-id-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.jp-orcid { color: var(--verified); }
+.jp-orcid-missing { font-size: 11px; color: var(--structure); }
+.jp-roles { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.jp-role { font-family: var(--ui); font-size: 10.5px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--sub); border: 1px solid var(--rule); border-radius: 5px; padding: 3px 8px; background: var(--haze); }
+.jp-role.muted { color: var(--structure); background: transparent; }
+
+/* ---- Assurance ladder ---- */
+.jp-ladder-lede { font-size: 13px; color: var(--sub); margin: 0 0 14px; max-width: 62ch; line-height: 1.5; }
+.jp-rungs { list-style: none; margin: 0; padding: 0; }
+.jp-rung { display: flex; gap: 13px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--rule); }
+.jp-rung:first-child { border-top: 0; }
+.jp-rung-dot { width: 26px; height: 26px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center; font-family: var(--ui); font-size: 12px; font-weight: 600; border: 2px solid var(--rule); color: var(--structure); background: #fff; }
+.jp-rung.past .jp-rung-dot { background: var(--verified); border-color: var(--verified); color: #fff; }
+.jp-rung.current .jp-rung-dot { border-color: var(--verified); color: var(--verified); box-shadow: 0 0 0 4px #eef5f2; }
+.jp-rung.future { opacity: 0.6; }
+.jp-rung-title { font-family: var(--ui); font-size: 14px; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 9px; }
+.jp-rung.future .jp-rung-title { color: var(--sub); }
+.jp-rung-you { font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--verified); border: 1px solid var(--verified); border-radius: 4px; padding: 2px 7px; font-weight: 600; }
+.jp-rung-blurb { font-size: 12.5px; color: var(--sub); line-height: 1.5; margin-top: 4px; max-width: 60ch; }
+
+/* ---- Certification ---- */
+.jp-cert-lede, .jp-curator-lede { font-size: 13px; color: var(--sub); margin: 0 0 14px; max-width: 64ch; line-height: 1.55; }
+.jp-cert-lede b { color: var(--ink); font-weight: 600; }
+.jp-cert-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.jp-cert-col { border: 1px solid var(--rule); border-radius: 8px; padding: 14px; background: #fcfdfb; }
+.jp-cert-step { font-family: var(--ui); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--structure); margin-bottom: 10px; }
+.jp-cert-sub { font-size: 12px; color: var(--sub); margin: 0 0 10px; }
+.jp-cert-note.ok { font-size: 13px; color: var(--verified); margin: 0; }
+.jp-cert-applied { margin-top: 12px; display: flex; flex-direction: column; gap: 7px; align-items: flex-start; }
+.jp-cert-idlabel { font-size: 11px; color: var(--structure); }
+.jp-cert-id, .jp-record-id { color: var(--type-red); background: #fdf3f1; border: 1px solid #f0d4cf; border-radius: 5px; padding: 3px 8px; word-break: break-all; }
+.jp-vouch-progress { display: inline-flex; align-items: center; gap: 7px; margin-top: 4px; }
+.jp-vouch-progress .dot { width: 11px; height: 11px; border-radius: 50%; border: 2px solid var(--rule); }
+.jp-vouch-progress .dot.on { background: var(--verified); border-color: var(--verified); }
+.jp-vouch-progress .dot.off { background: #fff; }
+.jp-vouch-text { font-family: var(--mono); font-size: 11px; color: var(--sub); margin-left: 3px; }
+
+/* ---- Record curator ---- */
+.jp-curator-lede b { color: var(--ink); font-weight: 600; }
+.jp-curator-ids { align-items: flex-start; }
+.jp-curator-ids .jose-field { flex: 1; min-width: 140px; margin-bottom: 12px; }
+.jp-record-out { margin-top: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 9px; font-family: var(--ui); font-size: 13px; color: var(--ink); }
+.jp-record-note { font-size: 11px; color: var(--structure); }
+
+/* ---- Private trust signal ---- */
+.jp-trust { display: flex; gap: 14px; align-items: flex-start; }
+.jp-trust-icon { font-size: 18px; color: var(--verified); flex: none; line-height: 1; margin-top: 1px; }
+.jp-trust-body { font-size: 12.5px; color: var(--sub); line-height: 1.55; max-width: 64ch; }
+.jp-trust-body b { color: var(--ink); font-weight: 600; }
+.jp-private-tag { font-family: var(--ui); font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--structure); border: 1px solid var(--rule); border-radius: 4px; padding: 2px 7px; margin-left: 8px; }
+
+@media (max-width: 720px) {
+  .jp-cert-grid { grid-template-columns: 1fr; }
+}

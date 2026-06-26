@@ -1,0 +1,86 @@
+/* Snippet Reference Viewer (FE3) — co-located styles for the citation cluster.
+   Only classes not already covered by jose.css live here. Reuses design tokens
+   (var(--ink|sub|haze|rule|type-red|ui|mono|verified|structure)). */
+
+/* Inline citation reference button — scholarly apparatus, not chrome. */
+.jose-refbtn {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  font-family: var(--body);
+  font-size: 13px;
+  color: var(--sub);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--rule);
+  padding: 0 1px;
+  border-radius: 2px;
+}
+.jose-refbtn:hover { color: var(--ink); border-bottom-color: var(--ink); }
+.jose-refbtn:focus-visible { outline: 2px solid var(--type-red); outline-offset: 2px; }
+.jose-refbtn .m {
+  position: relative;
+  top: -1px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--type-red);
+  flex: 0 0 auto;
+}
+.jose-refbtn .t { font-style: italic; }
+
+/* Snippet card */
+.jose-snip { max-width: 760px; }
+.jose-snip-views { display: flex; gap: 8px; margin-bottom: 14px; }
+.jose-snip-view {
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--sub);
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 7px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+}
+.jose-snip-view .r { color: var(--type-red); font-size: 13px; }
+.jose-snip-view.on { color: var(--ink); border-color: var(--ink); font-weight: 600; }
+.jose-snip-view:focus-visible { outline: 2px solid var(--type-red); outline-offset: 2px; }
+
+.jose-anchor-note { margin-top: 7px; font-size: 10px; color: var(--sub); font-style: italic; }
+
+/* hash-ok assurance line */
+.jose-snip-ok { font-family: var(--ui); font-size: 12px; color: var(--verified); margin: 4px 0 10px; }
+
+/* drift side-by-side comparison */
+.jose-drift-note { color: var(--sub); }
+.jose-snip-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 4px;
+}
+.jose-snip-side { min-width: 0; }
+.jose-snip-lbl {
+  font-family: var(--ui);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--structure);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.jose-snip-lbl.cited { color: var(--type-red); }
+.jose-snip-lbl .hash { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0; color: var(--sub); text-transform: none; }
+.jose-quote.current { border-left-color: var(--rule); }
+
+/* treatment view */
+.jose-snip-treatment { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.jose-snip-hint, p.jose-snip-hint { font-family: var(--ui); font-size: 11px; color: var(--sub); margin: 0; }
+
+@media (max-width: 720px) {
+  .jose-snip-compare { grid-template-columns: 1fr; }
+}

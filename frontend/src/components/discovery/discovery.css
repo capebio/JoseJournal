@@ -1,0 +1,49 @@
+/* Discovery (FE8) — graph-anchored browse, not a recency feed (Frontend Spec §5.7).
+   Reuses jose-page / jose-card / jose-badge / jose-mono; adds only the search +
+   filter scaffolding and the results grid that the base system doesn't cover. */
+
+/* anchor row: free-text box + anchor-kind segmented control */
+.disc-anchor { display: flex; gap: 12px; align-items: stretch; flex-wrap: wrap; margin-bottom: 14px; }
+.disc-anchor .disc-searchbox { flex: 1; min-width: 260px; display: flex; align-items: center; gap: 9px; border: 1px solid var(--rule); border-radius: 9px; background: #fff; padding: 0 12px; }
+.disc-anchor .disc-searchbox:focus-within { border-color: var(--ink); }
+.disc-anchor .disc-searchbox .ic { color: var(--structure); font-size: 14px; flex: none; }
+.disc-anchor .disc-searchbox input { flex: 1; border: 0; outline: none; background: transparent; font-family: var(--ui); font-size: 14px; color: var(--ink); padding: 11px 0; }
+.disc-anchor .disc-searchbox input::placeholder { color: var(--structure); }
+
+/* segmented control for the anchor kind (taxon | place | evidence) */
+.disc-kind { display: inline-flex; border: 1px solid var(--rule); border-radius: 9px; overflow: hidden; align-self: center; }
+.disc-kind button { border: 0; background: #fff; padding: 9px 13px; font-family: var(--ui); font-size: 12.5px; color: var(--sub); display: inline-flex; align-items: center; gap: 7px; }
+.disc-kind button + button { border-left: 1px solid var(--rule); }
+.disc-kind button[aria-pressed='true'] { background: var(--ink); color: var(--paper); }
+.disc-kind button .ki { width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: 0.7; }
+
+/* filter row: tier / type / status pickers + restricted-index toggle */
+.disc-filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; align-items: end; }
+.disc-filters .jose-field { margin-bottom: 0; }
+.disc-index { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; }
+
+/* count strip */
+.disc-count { font-family: var(--ui); font-size: 12px; color: var(--sub); margin: 20px 2px 12px; display: flex; align-items: center; gap: 10px; }
+.disc-count .disc-non { color: var(--structure); font-size: 11px; margin-left: auto; }
+
+/* results grid — finite list, NO infinite scroll */
+.disc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; }
+
+/* result card (linked into the Reader) */
+.disc-card { display: block; text-decoration: none; border: 1px solid var(--rule); border-radius: 10px; background: #fff; padding: 15px 16px; transition: border-color 0.12s, box-shadow 0.12s; }
+.disc-card:hover { border-color: var(--structure); box-shadow: 0 6px 20px rgba(24, 32, 27, 0.07); }
+.disc-card:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.disc-card-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 9px; }
+.disc-restricted { font-family: var(--ui); font-size: 9.5px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--type-red); border: 1px solid var(--type-red); border-radius: 5px; padding: 2px 7px; }
+.disc-card-title { font-family: var(--body); font-weight: 600; font-size: 18px; line-height: 1.25; color: var(--ink); margin: 0 0 6px; letter-spacing: -0.01em; }
+.disc-card-snip { font-family: var(--body); font-size: 13.5px; line-height: 1.5; color: var(--sub); margin: 0 0 12px; }
+.disc-card-foot { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.disc-status { font-family: var(--ui); font-size: 10px; letter-spacing: 0.07em; text-transform: uppercase; padding: 2px 8px; border-radius: 5px; border: 1px solid var(--rule); color: var(--sub); }
+.disc-status.s-vor { border-color: var(--verified); color: var(--verified); }
+.disc-status.s-reviewed { border-color: var(--verified); color: var(--verified); }
+.disc-status.s-retracted { border-color: var(--type-red); color: var(--type-red); }
+.disc-taxon { font-style: italic; }
+
+.disc-empty { border: 1px dashed var(--rule); border-radius: 10px; padding: 40px 20px; text-align: center; color: var(--structure); font-family: var(--ui); font-size: 13px; }
+.disc-err { border: 1px solid var(--type-red); background: #fdf3f1; border-radius: 10px; padding: 16px 18px; color: var(--type-red); font-family: var(--ui); font-size: 13px; }
+.disc-err b { display: block; margin-bottom: 4px; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }

@@ -1,0 +1,68 @@
+{
+  "realm": "jose",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": true,
+  "loginWithEmailAllowed": true,
+  "roles": {
+    "realm": [
+      { "name": "author", "description": "Submitter / author-maintainer" },
+      { "name": "contributor", "description": "Authenticated contributor (low-bar amendments)" },
+      { "name": "reviewer", "description": "Reviewer (open identity)" },
+      { "name": "editor", "description": "Editorial authority" },
+      { "name": "steward", "description": "Steward of living objects" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "jose-web",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": ["http://localhost:3000/*", "http://localhost:5173/*"],
+      "webOrigins": ["+"],
+      "protocol": "openid-connect"
+    }
+  ],
+  "users": [
+    {
+      "username": "testauthor",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "author@example.org",
+      "firstName": "Test",
+      "lastName": "Author",
+      "credentials": [{ "type": "password", "value": "josepw", "temporary": false }],
+      "realmRoles": ["author", "contributor"],
+      "attributes": { "assurance": ["verified"] }
+    },
+    {
+      "username": "testeditor",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "editor@example.org",
+      "firstName": "Test",
+      "lastName": "Editor",
+      "credentials": [{ "type": "password", "value": "josepw", "temporary": false }],
+      "realmRoles": ["editor", "steward", "contributor"],
+      "attributes": { "assurance": ["certified"] }
+    }
+  ],
+  "identityProviders": [
+    {
+      "alias": "orcid",
+      "displayName": "ORCID",
+      "providerId": "oidc",
+      "enabled": false,
+      "config": {
+        "authorizationUrl": "https://orcid.org/oauth/authorize",
+        "tokenUrl": "https://orcid.org/oauth/token",
+        "clientId": "REPLACE_ME",
+        "clientSecret": "REPLACE_ME",
+        "defaultScope": "openid",
+        "syncMode": "IMPORT"
+      }
+    }
+  ]
+}

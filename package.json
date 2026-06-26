@@ -1,0 +1,93 @@
+{
+  "name": "jose",
+  "version": "1.0.0",
+  "description": "JOSE — The Journal of Systematics and Ecology. v1 modular monolith (NestJS).",
+  "license": "AGPL-3.0-or-later",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "start": "ts-node -r tsconfig-paths/register src/main.ts",
+    "start:dev": "ts-node-dev -r tsconfig-paths/register --respawn src/main.ts",
+    "start:prod": "node dist/main.js",
+    "lint": "eslint \"src/**/*.ts\" \"test/**/*.ts\"",
+    "test": "jest",
+    "test:unit": "jest --selectProjects unit",
+    "test:e2e": "jest --selectProjects e2e --runInBand",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "stack:up": "docker compose up -d",
+    "stack:down": "docker compose down -v",
+    "db:migrate": "ts-node scripts/migrate.ts",
+    "stack:init": "ts-node scripts/init-stack.ts"
+  },
+  "dependencies": {
+    "@elastic/elasticsearch": "^8.14.0",
+    "@nestjs/common": "^10.4.4",
+    "@nestjs/config": "^3.2.3",
+    "@nestjs/core": "^10.4.4",
+    "@nestjs/passport": "^10.0.3",
+    "@nestjs/platform-express": "^10.4.4",
+    "@nestjs/swagger": "^7.4.2",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "ioredis": "^5.4.1",
+    "jwks-rsa": "^3.1.0",
+    "minio": "^8.0.1",
+    "nano": "^10.1.4",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "pg": "^8.12.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "tsc-alias": "^1.8.17",
+    "ulid": "^2.3.0"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^10.4.5",
+    "@nestjs/schematics": "^10.1.4",
+    "@nestjs/testing": "^10.4.4",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.13",
+    "@types/node": "^22.7.4",
+    "@types/passport-jwt": "^4.0.1",
+    "@types/pg": "^8.11.10",
+    "@types/supertest": "^6.0.2",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "5.6.3"
+  },
+  "jest": {
+    "projects": [
+      {
+        "displayName": "unit",
+        "preset": "ts-jest",
+        "testEnvironment": "node",
+        "rootDir": "src",
+        "testRegex": ".*\\.spec\\.ts$",
+        "moduleNameMapper": {
+          "^@core/(.*)$": "<rootDir>/core/$1",
+          "^@common/(.*)$": "<rootDir>/common/$1",
+          "^@persistence/(.*)$": "<rootDir>/persistence/$1",
+          "^@modules/(.*)$": "<rootDir>/modules/$1",
+          "^@src/(.*)$": "<rootDir>/$1"
+        }
+      },
+      {
+        "displayName": "e2e",
+        "preset": "ts-jest",
+        "testEnvironment": "node",
+        "rootDir": "test",
+        "testRegex": ".*\\.e2e-spec\\.ts$",
+        "moduleNameMapper": {
+          "^@core/(.*)$": "<rootDir>/../src/core/$1",
+          "^@common/(.*)$": "<rootDir>/../src/common/$1",
+          "^@persistence/(.*)$": "<rootDir>/../src/persistence/$1",
+          "^@modules/(.*)$": "<rootDir>/../src/modules/$1",
+          "^@src/(.*)$": "<rootDir>/../src/$1"
+        }
+      }
+    ]
+  }
+}

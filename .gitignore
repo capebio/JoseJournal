@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+**/dist/
+*.tsbuildinfo
+.vite/
+**/.vite/
+
+# Env & secrets (commit the *.example files only)
+.env
+.env.local
+**/.env
+!**/.env.example
+
+# Runtime / generated
+*.log
+*.pid
+*.output
+coverage/
+**/coverage/
+frontend/public/seed.json
+
+# Test/smoke scratch
+**/shot-*.png
+**/fe-smoke.png
+jest-*.txt
+build.txt
+rewrite-imports.mjs
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

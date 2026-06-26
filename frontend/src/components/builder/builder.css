@@ -1,0 +1,88 @@
+/* FE4 Builder — screen-specific classes. The herbarium palette + tokens
+   (--ai, --aih, --haze, --type-red, --verified, fonts) come from tokens.css;
+   these only add the authoring-surface layout the shared classes don't cover.
+   Ported from the prototype BuilderScreen. */
+
+.bld-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 15px 26px; border-bottom: 1px solid var(--rule); position: sticky; top: 0; background: var(--paper); z-index: 20; }
+.bld-title { font-family: var(--body); font-weight: 600; font-size: 20px; border: 0; background: transparent; color: var(--ink); min-width: 200px; flex: 1; }
+.bld-title::placeholder { color: var(--structure); }
+
+.bld-pill { position: relative; }
+.bld-pillbtn { font-family: var(--ui); font-size: 12px; border: 1px solid var(--rule); background: #fff; border-radius: 6px; padding: 6px 10px; color: var(--sub); display: inline-flex; gap: 7px; align-items: center; }
+.bld-pillbtn .d { width: 7px; height: 7px; border-radius: 50%; background: var(--structure); }
+.bld-pillbtn.commons .d { background: var(--verified); }
+.bld-pillbtn.ai { color: #1c4a63; border-color: #9cc1d6; }
+.bld-menu { position: absolute; top: 36px; left: 0; background: #fff; border: 1px solid var(--rule); border-radius: 8px; box-shadow: 0 12px 30px rgba(24, 32, 27, 0.14); padding: 6px; min-width: 180px; z-index: 40; }
+.bld-menu button { width: 100%; text-align: left; border: 0; background: transparent; font-family: var(--ui); font-size: 12.5px; color: var(--ink); padding: 8px 10px; border-radius: 6px; }
+.bld-menu button:hover { background: var(--haze); }
+.bld-menu .sub { font-size: 10px; color: var(--structure); padding: 6px 10px 4px; letter-spacing: 0.08em; text-transform: uppercase; }
+
+.bld-body { display: grid; grid-template-columns: minmax(0, 1fr) 322px; max-width: 1180px; margin: 0 auto; }
+.bld-editor { padding: 24px 34px 40px; border-right: 1px solid var(--rule); min-height: 62vh; }
+
+.bld-seg { position: relative; margin: 0 0 4px; border-radius: 7px; }
+.bld-seg textarea { width: 100%; font-family: var(--body); font-size: 17px; line-height: 1.55; color: var(--ink); border: 0; background: transparent; resize: none; padding: 9px 11px; border-radius: 7px; overflow: hidden; display: block; }
+.bld-seg textarea:focus { background: #fff; box-shadow: 0 0 0 1px var(--rule); outline: none; }
+.bld-seg.v-ai textarea { background: #eef4f8; }
+.bld-seg.v-aih textarea { background: #eef5ef; }
+.bld-seg.v-human textarea { background: var(--haze); }
+.bld-seg.claim textarea { border-left: 3px solid var(--type-red); background: #fdf6f5; }
+.bld-seg.obs textarea { border-left: 3px solid var(--structure); font-family: var(--mono); font-size: 13px; }
+
+.bld-segtag { font-family: var(--ui); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; position: absolute; right: 10px; top: -8px; z-index: 2; }
+.bld-segtag.ai { background: var(--ai); color: #1c4a63; }
+.bld-segtag.aih { background: var(--aih); color: #1f5440; }
+.bld-segtag.human { background: var(--haze); color: var(--sub); }
+
+.bld-segtools { display: flex; gap: 6px; padding: 1px 11px 6px; opacity: 0; transition: opacity 0.12s; }
+.bld-seg:hover .bld-segtools, .bld-seg:focus-within .bld-segtools { opacity: 1; }
+.bld-segtools button { font-family: var(--ui); font-size: 11px; color: var(--sub); border: 1px solid var(--rule); background: #fff; border-radius: 5px; padding: 3px 8px; }
+.bld-segtools button.ai { color: #1c4a63; }
+.bld-segtools button .sp { color: var(--type-red); }
+
+.bld-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--rule); }
+.bld-tbtn { font-family: var(--ui); font-size: 12.5px; border: 1px solid var(--rule); background: #fff; border-radius: 7px; padding: 7px 12px; color: var(--ink); display: inline-flex; gap: 7px; align-items: center; position: relative; }
+.bld-tbtn.ai { border-color: #9cc1d6; color: #1c4a63; }
+.bld-tbtn .sp { color: var(--type-red); }
+
+/* AI-view legend (the ◫ AI content view, AC 11.7) */
+.bld-ailegend { font-family: var(--ui); font-size: 11px; color: var(--sub); display: flex; gap: 14px; align-items: center; flex-wrap: wrap; padding: 7px 22px; border-bottom: 1px dashed var(--rule); background: #fff; }
+.bld-ailegend i { width: 13px; height: 13px; border-radius: 3px; display: inline-block; margin-right: 5px; vertical-align: -2px; }
+
+/* authorship + export rail */
+.bld-rail { padding: 24px 22px; font-family: var(--ui); }
+.bld-rh { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--structure); margin: 0 0 6px; }
+.bld-rsub { font-size: 11px; color: var(--sub); margin-bottom: 16px; }
+.bld-cov { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--verified); font-weight: 600; margin-bottom: 14px; }
+.bld-cov::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--verified); }
+
+.bld-bar { display: flex; height: 13px; border-radius: 7px; overflow: hidden; border: 1px solid var(--rule); margin: 4px 0 9px; }
+.bld-bar .h { background: var(--haze); }
+.bld-bar .a { background: var(--ai); }
+.bld-bar .ah { background: var(--aih); }
+.bld-leg { display: flex; flex-direction: column; gap: 5px; font-size: 11.5px; color: var(--sub); margin-bottom: 18px; }
+.bld-leg .lr { display: flex; align-items: center; gap: 8px; }
+.bld-leg .sw { width: 11px; height: 11px; border-radius: 3px; flex: none; }
+.bld-leg b { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--ink); font-weight: 500; }
+
+.bld-drow { display: flex; gap: 9px; font-size: 12px; padding: 7px 0; border-top: 1px solid var(--rule); }
+.bld-drow .k { color: var(--structure); width: 88px; font-size: 10.5px; letter-spacing: 0.05em; text-transform: uppercase; padding-top: 2px; flex: none; }
+.bld-drow .v { color: var(--ink); flex: 1; min-width: 0; word-break: break-word; }
+.bld-rolechip { display: inline-block; font-size: 11px; background: var(--haze); color: var(--sub); border-radius: 5px; padding: 2px 8px; margin: 0 5px 5px 0; }
+.bld-model { font-family: var(--mono); font-size: 11.5px; color: var(--ink); }
+.bld-modelin { font-family: var(--mono); font-size: 11.5px; color: var(--ink); border: 1px solid var(--rule); border-radius: 6px; padding: 4px 8px; background: #fff; width: 100%; }
+
+.bld-export { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 6px; }
+.bld-export button { font-family: var(--ui); font-size: 11.5px; border: 1px solid var(--rule); background: #fff; border-radius: 6px; padding: 6px 11px; color: var(--ink); }
+
+.bld-foot { position: sticky; bottom: 0; background: var(--paper); border-top: 1px solid var(--rule); padding: 13px 26px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; z-index: 25; }
+.bld-foot button { font-family: var(--ui); font-size: 13px; border-radius: 8px; padding: 9px 16px; border: 1px solid var(--rule); background: #fff; color: var(--ink); font-weight: 500; }
+.bld-foot button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.bld-foot button:disabled { opacity: 0.5; cursor: not-allowed; }
+.bld-foot .koid { font-family: var(--mono); font-size: 11px; color: var(--sub); }
+.bld-foot .spacer { margin-left: auto; }
+
+@media (max-width: 880px) {
+  .bld-body { grid-template-columns: 1fr; }
+  .bld-editor { border-right: 0; border-bottom: 1px solid var(--rule); }
+}
