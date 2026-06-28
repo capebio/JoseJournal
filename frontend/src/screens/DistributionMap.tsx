@@ -159,7 +159,7 @@ export function DistributionMap() {
   return (
     <div>
       <div className="mp-head">
-        <div className="mp-h-title">Distribution · {seed && koId === seed.koId && seed.name ? <i>{seed.name}</i> : <span className="jose-mono">{koId}</span>}</div>
+        <h1 className="mp-h-title">Distribution · {seed && koId === seed.koId && seed.name ? <i>{seed.name}</i> : <span className="jose-mono">{koId}</span>}</h1>
         <span className="mp-prec">precision
           <span className="mp-seg" role="group" aria-label="Precision">
             <button aria-pressed={precision === 'half'} onClick={() => setPrecision('half')}>Half°</button>

@@ -1,7 +1,7 @@
 /* Distribution Map (Frontend Spec §5.2 / prototype 3.jsx). Obfuscation-aware:
    public cells are QDS or coarser; precise points appear only under a live grant. */
 .mp-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 15px 26px; border-bottom: 1px solid var(--rule); position: sticky; top: 0; background: var(--paper); z-index: 20; }
-.mp-h-title { font-family: var(--body); font-weight: 600; font-size: 20px; }
+.mp-h-title { font-family: var(--body); font-weight: 600; font-size: 20px; margin: 0; }
 .mp-h-title i { font-style: italic; }
 .mp-prec { display: inline-flex; align-items: center; gap: 9px; font-family: var(--ui); font-size: 11px; color: var(--structure); }
 .mp-seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }

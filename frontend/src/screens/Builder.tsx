@@ -389,6 +389,10 @@ export function Builder() {
 
   return (
     <div onMouseDown={closeMenus}>
+      {/* Page heading for the document outline. In Write mode the visible title is
+          an editable input (not a heading); in Preview the manuscript title is the
+          h1, so this sr-only h1 is rendered only in Write mode to avoid two h1s. */}
+      {mode === 'write' && <h1 className="sr-only">Manuscript builder</h1>}
       {/* header: title + Write/Preview + tier/visibility + AI-view toggle */}
       <div className="bld-head" onMouseDown={(e) => e.stopPropagation()}>
         <input className="bld-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Manuscript title" aria-label="Manuscript title" />
