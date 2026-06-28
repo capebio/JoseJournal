@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { CurrentUser, MinAssurance, Public, Roles } from '@common/decorators';
+import { Capability, CurrentUser, MinAssurance, Public, Roles } from '@common/decorators';
 import type { Principal } from '@core/types';
 import { ReviewService } from './review.service';
 import { AddCoauthorDto, AddReviewerDto, ReplyDto, RespondCoauthorDto, SubmitReviewDto } from './review.dto';
@@ -32,7 +32,7 @@ export class ReviewController {
   }
 
   /** §7 POST /ko/:koId/review — submit/update a disposition + comment (open identity). */
-  @Roles('reviewer', 'editor', 'steward')
+  @Capability('peer-review')
   @Post(':koId/review')
   async submitReview(@Param('koId') koId: string, @Body() dto: SubmitReviewDto, @CurrentUser() user: Principal) {
     return this.review.submitReview(koId, user.accountId, dto.disposition, dto.comment, dto.threadId);

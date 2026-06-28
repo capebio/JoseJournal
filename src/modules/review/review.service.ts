@@ -8,6 +8,24 @@ import { ProvenanceService } from '@modules/provenance/provenance.service';
 const CONSENT_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
 
 /**
+ * // DECISION: D4 — the release gate set, single-sourced.
+ *
+ * Default (option a, the prototype asymmetry): orange/red reviewer dispositions
+ * without an author reply HARD-BLOCK a VoR release; named-unconfirmed co-authors
+ * only WARN (coauthorStatesThatBlock empty). Flip to (b) "block on unconfirmed
+ * co-authors" by adding states to coauthorStatesThatBlock; (c) by listing only
+ * declined/negotiating; (d) per-tier by keying this descriptor on tier. Change it
+ * HERE — releaseBlockers (and the FE gate copy) read this one descriptor.
+ */
+export const RELEASE_GATE: {
+  blockingDispositions: ReviewerDisposition[];
+  coauthorStatesThatBlock: CoauthorConsent['state'][];
+} = {
+  blockingDispositions: ['orange', 'red'],
+  coauthorStatesThatBlock: [],
+};
+
+/**
  * Advisory reviewer↔subject relevance (§3.10). The real signal is an AI-assessed
  * score; v1 emits a deterministic stub in [0,1) so the field is populated and the
  * UI/relevance plumbing exists without coupling to a model. Never gates anything.
@@ -141,14 +159,19 @@ export class ReviewService {
   }
 
   /**
-   * §9.6 release gate. Returns the threads that BLOCK a release: disposition is
-   * orange or red AND the author has not yet replied. The orchestrator calls this
-   * before allowing a release; a non-empty result means "blocked".
+   * §9.6 release gate. Returns the threads that BLOCK a release per RELEASE_GATE:
+   * a blocking disposition AND no author reply. The orchestrator calls this before
+   * allowing a release; a non-empty result means "blocked".
+   *
+   * Co-author consent: RELEASE_GATE.coauthorStatesThatBlock is empty by default
+   * (the asymmetry (a) — unconfirmed co-authors warn, not block). To adopt option
+   * (b) add states to that list and have the controller also reject on
+   * listCoauthors(koId).filter(c => RELEASE_GATE.coauthorStatesThatBlock.includes(c.state)).
    */
   async releaseBlockers(koId: string): Promise<ReviewThread[]> {
     const threads = await this.reviews.listForKo(koId);
     return threads.filter(
-      (t) => (t.disposition === 'orange' || t.disposition === 'red') && !(t.authorReply ?? '').trim(),
+      (t) => RELEASE_GATE.blockingDispositions.includes(t.disposition) && !(t.authorReply ?? '').trim(),
     );
   }
 

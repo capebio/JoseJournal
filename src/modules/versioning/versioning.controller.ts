@@ -1,6 +1,7 @@
 import { Body, Controller, ConflictException, Post, Param } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CurrentUser, MinAssurance, Roles } from '@common/decorators';
+import { assertCapability } from '@common/capabilities';
 import type { ActorRole, Principal } from '@core/types';
 import { VersioningService } from './versioning.service';
 import { KnowledgeObjectService } from '@modules/knowledge-object/knowledge-object.service';
@@ -47,6 +48,10 @@ export class VersioningController {
   @Roles('author', 'editor', 'steward')
   @Post(':koId/release')
   async release(@Param('koId') koId: string, @Body() dto: ReleaseDto, @CurrentUser() user: Principal) {
+    // Capability floor per release type (// DECISION: D7): a Commons publish needs
+    // 'verified'; a Journal VoR (mints a DOI, freezes the record) needs 'certified'.
+    const tier = dto.tier ?? 'journal';
+    assertCapability(user, tier === 'commons' ? 'publish-commons' : 'release-vor');
     // §9.6 release gate: an orange/red disposition with no author right-of-reply
     // blocks any release until the author responds.
     const blockers = await this.review.releaseBlockers(koId);

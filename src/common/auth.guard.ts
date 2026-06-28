@@ -5,10 +5,9 @@ import { JwksClient } from 'jwks-rsa';
 import { PORTS, type IdentityRepo } from '@core/ports';
 import type { ActorRole, Assurance, Principal } from '@core/types';
 import { mintId } from '@core/ids';
-import { MIN_ASSURANCE_KEY, PUBLIC_KEY, ROLES_KEY } from './decorators';
+import { CAPABILITY_KEY, MIN_ASSURANCE_KEY, PUBLIC_KEY, ROLES_KEY } from './decorators';
+import { ASSURANCE_RANK, assertCapability } from './capabilities';
 import { decodeJwt, verifyHs256, verifyRs256, type JwtClaims } from './jwt';
-
-const ASSURANCE_RANK: Record<Assurance, number> = { unverified: 0, verified: 1, certified: 2 };
 
 /**
  * The trust boundary's front door (§2.5, §7). Verifies the Keycloak-issued JWT
@@ -49,6 +48,14 @@ export class AuthGuard implements CanActivate {
     // Even public endpoints get a principal when a valid token is present, but
     // assurance/role gates only apply to protected handlers.
     if (isPublic) return true;
+
+    // A @Capability resolves against the // DECISION: D7 registry and is the
+    // authoritative gate when present (it subsumes @MinAssurance/@Roles).
+    const capability = this.reflector.getAllAndOverride<string>(CAPABILITY_KEY, [ctx.getHandler(), ctx.getClass()]);
+    if (capability) {
+      assertCapability(principal, capability);
+      return true;
+    }
 
     const minAssurance = this.reflector.getAllAndOverride<Assurance>(MIN_ASSURANCE_KEY, [ctx.getHandler(), ctx.getClass()]);
     if (minAssurance && ASSURANCE_RANK[principal.assurance] < ASSURANCE_RANK[minAssurance]) {

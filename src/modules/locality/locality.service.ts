@@ -115,6 +115,11 @@ export class LocalityService {
     offlinePkg?: boolean;
   }): Promise<AccessGrant> {
     if (!(await this.locality.getPrecise(input.objectRef))) throw new NotFoundException(`no precise record for ${input.objectRef}`);
+    // Separation of duties: a granting authority cannot grant precise access to
+    // itself (§18 — certification is not self-served site access).
+    if (input.grantee === input.grantedBy) {
+      throw new ForbiddenException('separation of duties: cannot grant precise access to yourself');
+    }
     const now = Date.now();
     const grant: AccessGrant = {
       id: mintId('grant'),
@@ -138,7 +143,16 @@ export class LocalityService {
     await this.audit.append({ ts: at, actorRef, action: 'grant-revoked', objectRef: grantId, disclosure: 'restricted', detail: {} });
   }
 
-  /** The policy decision, isolated for testability. */
+  /**
+   * The precise-access policy decision, isolated for testability.
+   *
+   * // DECISION: D1 — grant scope. Adopted default = option (a) per-object,
+   * purpose-bound, TTL'd, revocable, audited: this function keys on a single
+   * objectRef + purpose, so one grant never reveals other objects' points. To
+   * adopt (b) per-session or (c) per-batch, widen AccessGrant to scope:{objectId?,
+   * observationIds?[]} and match it HERE — the scope-matching lives only in this
+   * one function.
+   */
   async evaluate(principal: Principal, objectRef: string, requestPurpose: string, now: Date): Promise<{ decision: PolicyDecision; grants: AccessGrant[] }> {
     if (principal.assurance !== 'certified') {
       return { decision: { allow: false, reason: 'not-certified' }, grants: [] };

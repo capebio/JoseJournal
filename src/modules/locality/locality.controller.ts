@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { CurrentUser, MinAssurance, Public, Roles } from '@common/decorators';
+import { Capability, CurrentUser, Public } from '@common/decorators';
 import type { Principal } from '@core/types';
 import { LocalityService } from './locality.service';
 import { IssueGrantDto, PreciseQueryDto } from './locality.dto';
@@ -22,7 +22,7 @@ export class LocalityController {
    * granting authority is editor/steward (certification ≠ automatic site access,
    * §18); the grantee is the certified researcher who will consume it.
    */
-  @Roles('editor', 'steward')
+  @Capability('grant-precise')
   @Post('localities/:obsId/access')
   async issueGrant(@Param('obsId') obsId: string, @Body() dto: IssueGrantDto, @CurrentUser() user: Principal) {
     return this.locality.issueGrant({
@@ -36,7 +36,7 @@ export class LocalityController {
   }
 
   /** §7 GET /localities/:obsId/precise — serve precise IFF active grant (audited). */
-  @MinAssurance('certified')
+  @Capability('request-precise')
   @Get('localities/:obsId/precise')
   async precise(@Param('obsId') obsId: string, @Query() q: PreciseQueryDto, @CurrentUser() user: Principal) {
     return this.locality.servePrecise(user, obsId, q.purpose, q.offline === 'true');
