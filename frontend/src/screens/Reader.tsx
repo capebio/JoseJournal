@@ -171,10 +171,13 @@ export function Reader() {
 
   const renderBlock = (block: ContentBlock, sectionPath: string) => {
     if (block.restricted) return null; // never render restricted (precise) content (§6)
-    const aiOn = showAi && block.type === 'verbose'; // v1: no per-block AI origin; verbose blocks shaded as illustrative
+    // Shade by the RECORDED authorship origin (provenance observed at authoring),
+    // not a placeholder — the AI overlay reflects what was actually recorded.
+    const origin = block.origin;
+    const aiOn = showAi && (origin === 'ai' || origin === 'ai-human');
     return (
       <div key={block.blockId} className={`jose-block ${aiOn ? 'ai-on' : ''}`} data-block={block.blockId} data-section={sectionPath}>
-        {aiOn && <div className="jose-aitag"><i />AI-assisted · human-reviewed</div>}
+        {aiOn && <div className="jose-aitag"><i />{origin === 'ai' ? 'AI-drafted' : 'AI → human'}</div>}
         <ProvChip blockId={block.blockId} />
         {block.type === 'figure' ? (
           <div className="jose-fig">

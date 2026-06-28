@@ -35,6 +35,18 @@ interface Block { id: string; type: BlockKind; text: string; origin?: Origin; ai
 
 let uidCounter = 0;
 const uid = () => `b${(++uidCounter).toString(36)}${Date.now().toString(36).slice(-3)}`;
+
+/**
+ * // DECISION: D2 — when does editing an AI block reclassify it to "ai → human"?
+ * Default (option a): ANY edit to an `ai` block flips it (and records the 'editing'
+ * role). Change this single predicate to adopt (b) an edit-distance/fraction
+ * threshold or (c) span-level tracking. (Server-side recompute against a persisted
+ * aiOriginalHash is the auditable follow-up.)
+ */
+function classifyOrigin(prevOrigin: Origin | undefined, nextText: string, aiOriginal: string | undefined): { origin: Origin | undefined; flipped: boolean } {
+  if (prevOrigin === 'ai' && nextText !== aiOriginal) return { origin: 'ai-human', flipped: true };
+  return { origin: prevOrigin, flipped: false };
+}
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 const authorsToArray = (s: string): string[] => s.split(/[·,;]/).map((x) => x.trim()).filter(Boolean);
 
@@ -158,8 +170,9 @@ export function Builder() {
     if (id === 'title') { setTitle(text); return; }
     setBlocks((prev) => prev.map((b) => {
       if (b.id !== id) return b;
-      if (b.origin === 'ai' && text !== b.aiOriginal) { addRole('editing'); return { ...b, text, origin: 'ai-human' }; }
-      return { ...b, text };
+      const { origin, flipped } = classifyOrigin(b.origin, text, b.aiOriginal);
+      if (flipped) addRole('editing');
+      return { ...b, text, origin };
     }));
   }, [addRole]);
 
@@ -260,6 +273,12 @@ export function Builder() {
     addAndInsert(r);
   }, [pick, addAndInsert]);
 
+  // // DECISION: D6 — living-citation default + tip-drift. Default: pin the chosen
+  // version (VoR-if-exists-else-tip is the honest default offered in the picker)
+  // and record {concept, version, isVoR, tip, section, hash}. The full follow-up
+  // is to mint a real content-addressed snapshot at cite time via
+  // citation.service.createSnippet and surface later tip-drift; this is the one
+  // place that policy lives.
   const addJose = useCallback((obj: JoseObject, ver: string) => {
     const isVoR = !!obj.vor && ver === obj.vor;
     addAndInsert({
@@ -277,6 +296,11 @@ export function Builder() {
   const insertExisting = useCallback((key: string) => { insertToken(`[@${key}]`); setPick(null); flash('Citation inserted'); }, [insertToken, flash]);
 
   // ── composition (by character count over para/claim blocks) ────────────────
+  // // DECISION: D3 — what composition metric is disclosed, and how? Default
+  // (option a): a recorded three-way human/AI/AI-edited split by character count,
+  // shown in the Authorship rail and the export footer (derived from the PERSISTED
+  // block `origin`, not a stored forensic number). Change the metric or its
+  // disclosure surface here (and in the server export footer) to adopt (b)/(c)/(d).
   const comp = useMemo(() => {
     let h = 0, a = 0, ah = 0;
     for (const b of blocks) {
@@ -378,7 +402,7 @@ export function Builder() {
         link.click();
         link.remove();
         URL.revokeObjectURL(url);
-        flash(`Exported as ${fmt.toUpperCase()} · bibliography included`);
+        flash(`Exported as ${fmt.toUpperCase()} · bibliography + provenance footer`);
       } else {
         flash(`${fmt.toUpperCase()} generated`);
       }

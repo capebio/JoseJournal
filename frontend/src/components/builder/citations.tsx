@@ -103,6 +103,11 @@ export function renderCite(keysRaw: string, citeMap: Record<string, CiteEntry>, 
 export function renderInline(text: string | undefined, citeMap: Record<string, CiteEntry>, style: CiteStyle): ReactNode {
   if (!text) return null;
   const out: ReactNode[] = [];
+  // // DECISION: D5 — in-text citation representation. Default (option a): Pandoc
+  // `[@key]` tokens + `*markdown*` italics in plain textareas, resolved here at
+  // render/preview time and round-tripped to Markdown export. This regex + the
+  // textarea block component are the editor seam; swapping to inline chips
+  // (ProseMirror/Lexical, option b) replaces this one boundary.
   const re = /\[@([^\]]+)\]|\*([^*]+)\*/g;
   let m: RegExpExecArray | null;
   let last = 0;

@@ -105,8 +105,9 @@ export function CitePicker({ pick, setPick, refs, insertExisting, resolveDoi, ad
               <div className="bld-josecard" key={i}>
                 <div className="jt">{o.authors} ({o.year}). <i>{o.title}</i></div>
                 <div className="jcoord">{o.concept} · tip {o.tip}</div>
+                {/* // DECISION: D6 — VoR (if one exists) is the honest default pin. */}
                 <div className="jv">
-                  {o.vor && <button className="vor" onClick={() => addJose(o, o.vor!)}>cite VoR ({o.vor})</button>}
+                  {o.vor && <button className="vor" onClick={() => addJose(o, o.vor!)}>cite VoR ({o.vor}) · default</button>}
                   <button onClick={() => addJose(o, o.tip)}>cite tip ({o.tip})</button>
                 </div>
               </div>

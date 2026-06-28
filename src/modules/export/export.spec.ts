@@ -1,4 +1,5 @@
 import { TestingModule } from '@nestjs/testing';
+import { PORTS, type AiDeclarationRepo } from '@core/ports';
 import type { KnowledgeObjectContent, Principal } from '@core/types';
 import { KnowledgeObjectService } from '@modules/knowledge-object/knowledge-object.service';
 import { ProvenanceService } from '@modules/provenance/provenance.service';
@@ -12,15 +13,17 @@ const TITLE = 'Aizoaceae draft treatment';
 describe('§9.8 Export / no-cage', () => {
   let mod: TestingModule;
   let ko: KnowledgeObjectService;
+  let aiDecl: AiDeclarationRepo;
   let exporter: ExportService;
 
   beforeEach(async () => {
     mod = await makeContext();
     await mod.init();
     ko = mod.get(KnowledgeObjectService);
+    aiDecl = mod.get(PORTS.AiDeclarationRepo);
     // ExportModule is wired by the orchestrator; here we compose the service over
-    // the same in-memory KnowledgeObjectService + (global) ProvenanceService.
-    exporter = new ExportService(ko, mod.get(ProvenanceService));
+    // the same in-memory KnowledgeObjectService + (global) ProvenanceService + AI repo.
+    exporter = new ExportService(ko, mod.get(ProvenanceService), aiDecl);
   });
   afterEach(async () => mod.close());
 
@@ -179,6 +182,29 @@ describe('§9.8 Export / no-cage', () => {
       const { body } = await exporter.export(entity._id, 'md', null, { ref: author().accountId, role: 'author' });
       expect(body).toContain('# Plain draft');
       expect(body).not.toContain('## References');
+    });
+
+    it('appends an AI provenance + composition footer when a declaration or AI content exists', async () => {
+      const content: KnowledgeObjectContent = {
+        title: 'AI-assisted note',
+        sections: [{ path: 'body', blocks: [
+          { blockId: 'blk:h', type: 'paragraph', text: 'A human-written sentence here.' },
+          { blockId: 'blk:a', type: 'paragraph', text: 'An AI-drafted sentence.', origin: 'ai' },
+        ] }],
+        claims: {},
+      };
+      const { entity } = await ko.createKo({ koType: 'article', content, actor: { ref: author().accountId, role: 'author' }, visibility: 'private' });
+      await aiDecl.put({ koId: entity._id, coverage: 'recorded', role: 'drafting,editing', model: 'claude-sonnet-4-6', accountableHuman: 'acct:botha', percentage: 50, recordedAt: new Date().toISOString() });
+
+      const { body } = await exporter.export(entity._id, 'md', null, { ref: author().accountId, role: 'author' });
+      expect(body).toContain('*AI provenance (recorded)* — roles: drafting,editing; model: claude-sonnet-4-6; accountable: acct:botha.');
+      expect(body).toMatch(/\*Composition\* — human \d+% · AI \d+% · AI-edited \d+%\./);
+    });
+
+    it('a fully-human draft with no declaration exports without a provenance footer', async () => {
+      const { entity } = await ko.createKo({ koType: 'treatment', content: sampleContent('Human only'), actor: { ref: author().accountId, role: 'author' }, visibility: 'private' });
+      const { body } = await exporter.export(entity._id, 'md', null, { ref: author().accountId, role: 'author' });
+      expect(body).not.toContain('AI provenance');
     });
   });
 });
