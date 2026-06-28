@@ -30,6 +30,9 @@ jest-*.txt
 build.txt
 rewrite-imports.mjs
 
+# EpicDesignReview audit trail (the EpicDesignReview.md report is committed; the workspace is not)
+.epicdesignreview/
+
 # OS / editor
 .DS_Store
 Thumbs.db
