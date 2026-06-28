@@ -1,5 +1,5 @@
 import { TestingModule } from '@nestjs/testing';
-import type { Principal } from '@core/types';
+import type { KnowledgeObjectContent, Principal } from '@core/types';
 import { KnowledgeObjectService } from '@modules/knowledge-object/knowledge-object.service';
 import { ProvenanceService } from '@modules/provenance/provenance.service';
 import { makeContext, sampleContent } from '@src/test-support/make-context';
@@ -109,5 +109,76 @@ describe('§9.8 Export / no-cage', () => {
 
   it('escapes XML entities in JATS output', async () => {
     expect(escapeXml('a & b < c > d "e" \'f\'')).toBe('a &amp; b &lt; c &gt; d &quot;e&quot; &apos;f&apos;');
+  });
+
+  describe('§5.3 bibliography-aware export', () => {
+    /** Manuscript with an abstract, in-text [@key] tokens, and a bibliography. */
+    function manuscript(): KnowledgeObjectContent {
+      return {
+        title: 'Pollinator record',
+        abstract: 'First timed visit to *M. aureum* [@klak2012].',
+        sections: [
+          {
+            path: 'introduction',
+            title: 'Introduction',
+            blocks: [
+              { blockId: 'blk:1', type: 'paragraph', text: 'A mesemb radiation [@klak2012]; treated as a living object [@botha2026].' },
+              { blockId: 'blk:2', type: 'claim-block', text: 'A bee was recorded [@unknownkey].' },
+            ],
+          },
+        ],
+        claims: {},
+        references: [
+          { id: 'ref:1', key: 'klak2012', type: 'article', short: 'Klak & Bruyns', authors: 'Klak, C. & Bruyns, P. V.', year: '2012', title: 'A phylogeny of Mesembryanthemoideae', source: 'Taxon 61', doi: '10.1002/tax.612009' },
+          { id: 'ref:2', key: 'botha2026', type: 'jose', short: 'Botha', authors: 'Botha, R.', year: '2026', title: 'M. aureum — a living treatment', source: 'JOSE', jose: { concept: '10.59321/jose.aizo.0142', version: 'v2', isVoR: true, tip: 'v3', section: '§description', hash: '9f2ac1e7' } },
+        ],
+      };
+    }
+
+    async function manuscriptKo() {
+      const { entity } = await ko.createKo({
+        koType: 'treatment',
+        content: manuscript(),
+        actor: { ref: author().accountId, role: 'author' },
+        visibility: 'private',
+        authors: ['acct:botha', 'acct:dge'],
+      });
+      return entity._id;
+    }
+
+    it('markdown renders authors, abstract, numbered in-text cites and a reference list', async () => {
+      const koId = await manuscriptKo();
+      const { body } = await exporter.export(koId, 'md', null, { ref: author().accountId, role: 'author' });
+      expect(body).toContain('*acct:botha · acct:dge*');
+      expect(body).toContain('**Abstract.** First timed visit to *M. aureum* [1].');
+      // klak2012 is cited first (in the abstract) → [1]; botha2026 → [2].
+      expect(body).toContain('A mesemb radiation [1]; treated as a living object [2].');
+      // claim block prefix + unresolved key renders as [?].
+      expect(body).toContain('> **Claim.** A bee was recorded [?].');
+      expect(body).toContain('## References');
+      expect(body).toContain('[1] Klak, C. & Bruyns, P. V. (2012). A phylogeny of Mesembryanthemoideae. Taxon 61. https://doi.org/10.1002/tax.612009');
+      expect(body).toContain('[2] Botha, R. (2026). M. aureum — a living treatment. JOSE v2 (Version of Record).');
+    });
+
+    it('JATS carries an <abstract> and a <ref-list> when present', async () => {
+      const koId = await manuscriptKo();
+      const { body } = await exporter.export(koId, 'jats', null, { ref: author().accountId, role: 'author' });
+      expect(body).toContain('<abstract><p>First timed visit to *M. aureum* [1].</p></abstract>');
+      expect(body).toContain('<back><ref-list>');
+      expect(body).toContain('<ref id="ref-klak2012">');
+      expect(body.endsWith('</article>')).toBe(true);
+    });
+
+    it('sampleContent (no abstract/refs) still renders without a References section', async () => {
+      const { entity } = await ko.createKo({
+        koType: 'treatment',
+        content: sampleContent('Plain draft'),
+        actor: { ref: author().accountId, role: 'author' },
+        visibility: 'private',
+      });
+      const { body } = await exporter.export(entity._id, 'md', null, { ref: author().accountId, role: 'author' });
+      expect(body).toContain('# Plain draft');
+      expect(body).not.toContain('## References');
+    });
   });
 });

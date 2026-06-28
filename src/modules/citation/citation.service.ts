@@ -28,6 +28,8 @@ export interface CiteResult {
 
 export interface SnippetResolution {
   drift: boolean;
+  /** The KO that owns the pinned version — lets the viewer build a real /ko/:koId/v/:verId link. */
+  koId: string;
   snippet: SnippetAnchor;
   /** Present when drift=false — the block exactly matches the cited state. */
   block?: ContentBlock;
@@ -224,6 +226,7 @@ export class CitationService {
     if (!liveBlock) {
       return {
         drift: true,
+        koId: pinned.ko,
         snippet,
         citedText: snippet.quotedText,
         block: citedBlock,
@@ -232,10 +235,11 @@ export class CitationService {
     }
 
     if (CitationService.blockHash(liveBlock) === snippet.contentHash) {
-      return { drift: false, snippet, block: liveBlock };
+      return { drift: false, koId: pinned.ko, snippet, block: liveBlock };
     }
     return {
       drift: true,
+      koId: pinned.ko,
       snippet,
       citedText: snippet.quotedText,
       currentBlock: liveBlock,

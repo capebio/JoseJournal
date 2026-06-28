@@ -75,6 +75,11 @@ export interface ContentBlock {
   /** media:… for figure blocks. */
   media?: string[];
   /**
+   * Authorship origin recorded by the Builder as content is written (§7 / AC 11.7).
+   * Optional so legacy blocks (and machine-authored content) hash unchanged.
+   */
+  origin?: 'human' | 'ai' | 'ai-human';
+  /**
    * Marks a block whose text encodes precise locality and must NEVER appear in
    * a public projection or be quotable via a snippet (§6 leakage checklist).
    */
@@ -87,10 +92,41 @@ export interface ContentSection {
   blocks: ContentBlock[];
 }
 
+/**
+ * A bibliographic reference attached to a manuscript (§5.3 Builder). `key` is the
+ * in-text citation token (referenced as `[@key]` inside block text); `type` drives
+ * formatting. A `jose` reference pins a living object at a specific version — the
+ * three-identifier model exercised from inside authoring (concept DOI + version +
+ * whether the pinned version was the VoR or the moving tip).
+ */
+export interface Reference {
+  id: string; // ref:… (local to the manuscript)
+  key: string; // citation key used as [@key] in block text
+  type: 'article' | 'book' | 'web' | 'jose';
+  short: string; // short author label for author–date style
+  authors: string;
+  year: string;
+  title: string;
+  source?: string;
+  doi?: string | null;
+  jose?: {
+    concept: string; // concept DOI of the living object
+    version: string; // the version label that was pinned
+    isVoR: boolean; // true when the pinned version was the Version of Record
+    tip?: string | null;
+    section?: string | null;
+    hash?: string | null; // snippet content hash at cite time
+  } | null;
+}
+
 export interface KnowledgeObjectContent {
   title: string;
+  /** Optional manuscript abstract (§5.3). Dropped from the hash when absent. */
+  abstract?: string;
   sections: ContentSection[];
   claims: Record<string, Claim>; // keyed by claim:…
+  /** Manuscript bibliography (§5.3). Optional so existing content hashes unchanged. */
+  references?: Reference[];
 }
 
 export interface KnowledgeObjectEntity {

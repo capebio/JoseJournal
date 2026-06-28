@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import type { ContentBlock, ContentSection, KnowledgeObjectContent, VersionDoc } from '@core/types';
+import type { ContentBlock, ContentSection, KnowledgeObjectContent, Reference, VersionDoc } from '@core/types';
 import { KnowledgeObjectService } from '@modules/knowledge-object/knowledge-object.service';
 import { ProvenanceService } from '@modules/provenance/provenance.service';
 
@@ -43,6 +43,59 @@ export function escapeXml(s: string): string {
 /** Pick the caption a reader sees at surface depth (falls back to verbose). */
 function surfaceCaption(block: ContentBlock): string | undefined {
   return block.captions?.surface ?? block.captions?.verbose;
+}
+
+const CITE_RE = /\[@([^\]]+)\]/g;
+
+/** Split a `[@a;b,c]` token's inner text into bare citation keys. */
+function citeKeys(inner: string): string[] {
+  return inner
+    .split(/[;,]/)
+    .map((s) => s.trim().replace(/^@/, ''))
+    .filter(Boolean);
+}
+
+/**
+ * First-appearance citation order across the whole manuscript (title, abstract,
+ * every block). Only keys that resolve to a stored reference are numbered — this
+ * is what lets in-text `[@key]` tokens render as `[1]` and the reference list
+ * appear in citation order, mirroring the Builder's preview (§5.3).
+ */
+function buildCiteOrder(content: KnowledgeObjectContent): { order: string[]; numByKey: Record<string, number> } {
+  const known = new Set((content.references ?? []).map((r) => r.key));
+  const order: string[] = [];
+  const texts = [content.title, content.abstract ?? '', ...content.sections.flatMap((s) => s.blocks.map((b) => b.text ?? ''))];
+  for (const t of texts) {
+    let m: RegExpExecArray | null;
+    const re = new RegExp(CITE_RE);
+    while ((m = re.exec(t)) !== null) {
+      for (const key of citeKeys(m[1])) {
+        if (known.has(key) && !order.includes(key)) order.push(key);
+      }
+    }
+  }
+  const numByKey: Record<string, number> = {};
+  order.forEach((k, i) => (numByKey[k] = i + 1));
+  return { order, numByKey };
+}
+
+/** Replace in-text `[@key]` tokens with numbered `[n]` (or `[?]` when unresolved). */
+function resolveCites(text: string, numByKey: Record<string, number>): string {
+  return text.replace(CITE_RE, (_full, inner: string) => {
+    const nums = citeKeys(inner).map((k) => numByKey[k]).filter((n): n is number => typeof n === 'number');
+    return nums.length ? `[${nums.join(', ')}]` : '[?]';
+  });
+}
+
+/** Plain-text formatter for one reference (mirrors the Builder's `plainRef`). */
+function plainRef(r: Reference): string {
+  if (r.type === 'book' || r.type === 'web') return `${r.authors} (${r.year}). ${r.title}. ${r.source ?? ''}.`;
+  if (r.type === 'jose' && r.jose) {
+    const vor = r.jose.isVoR ? ' (Version of Record)' : ' (living tip)';
+    const anchor = `${r.jose.concept} [${r.jose.section ?? ''}; ver:sha256-${r.jose.hash ?? ''}…]`;
+    return `${r.authors} (${r.year}). ${r.title}. JOSE ${r.jose.version}${vor}. ${anchor}.`;
+  }
+  return `${r.authors} (${r.year}). ${r.title}. ${r.source ?? ''}.${r.doi ? ` https://doi.org/${r.doi}` : ''}`;
 }
 
 /**
@@ -102,7 +155,7 @@ export class ExportService {
       case 'json':
         return this.renderJson(version);
       case 'md':
-        return this.renderMarkdown(version.content);
+        return this.renderMarkdown(version);
       case 'jats':
         return this.renderJats(version.content);
       case 'docx':
@@ -116,29 +169,49 @@ export class ExportService {
   }
 
   /**
-   * Markdown: '# '+title, then for each section a '## '+(title||path) heading and
-   * its blocks — paragraph text verbatim, figures as '![caption]' at surface depth.
+   * Markdown (Pandoc-style): '# '+title, optional '*authors*' and '**Abstract.**'
+   * lines, then each section as '## '+(title||path) with its blocks — paragraph
+   * text, claim blocks as '> **Claim.**', figures as '![caption]'. In-text
+   * `[@key]` tokens resolve to numbered `[n]`, and a '## References' list is
+   * appended in citation order when the manuscript carries a bibliography (§5.3).
+   * `*italic*` is left intact (valid Markdown).
    */
-  renderMarkdown(content: KnowledgeObjectContent): string {
-    const lines: string[] = [`# ${content.title}`];
+  renderMarkdown(version: VersionDoc): string {
+    const content = version.content;
+    const { order, numByKey } = buildCiteOrder(content);
+    const lines: string[] = [`# ${resolveCites(content.title, numByKey)}`];
+    if (version.authors?.length) lines.push('', `*${version.authors.join(' · ')}*`);
+    if (content.abstract) lines.push('', `**Abstract.** ${resolveCites(content.abstract, numByKey)}`);
     for (const section of content.sections) {
       lines.push('', `## ${section.title ?? section.path}`);
       for (const block of section.blocks) {
-        const rendered = this.markdownBlock(block);
+        const rendered = this.markdownBlock(block, numByKey);
         if (rendered !== null) lines.push('', rendered);
       }
+    }
+    if (order.length) {
+      lines.push('', '## References');
+      order.forEach((key, i) => {
+        const ref = (content.references ?? []).find((r) => r.key === key);
+        if (ref) lines.push('', `[${i + 1}] ${plainRef(ref)}`);
+      });
     }
     return lines.join('\n') + '\n';
   }
 
-  private markdownBlock(block: ContentBlock): string | null {
+  private markdownBlock(block: ContentBlock, numByKey: Record<string, number>): string | null {
     if (block.type === 'figure') {
-      return `![${surfaceCaption(block) ?? ''}]`;
+      const cap = surfaceCaption(block);
+      return `![${cap ? resolveCites(cap, numByKey) : ''}]`;
     }
     if (block.type === 'caption') {
-      return surfaceCaption(block) ?? block.text ?? null;
+      const cap = surfaceCaption(block) ?? block.text;
+      return cap != null ? resolveCites(cap, numByKey) : null;
     }
-    return block.text ?? null;
+    if (block.text == null) return null;
+    const text = resolveCites(block.text, numByKey);
+    if (block.type === 'claim-block') return `> **Claim.** ${text}`;
+    return text;
   }
 
   /**
@@ -146,22 +219,41 @@ export class ExportService {
    * one <p> per paragraph block; figure captions become a <p>. All text escaped.
    */
   renderJats(content: KnowledgeObjectContent): string {
-    const body = content.sections.map((s) => this.jatsSection(s)).join('');
+    const { order, numByKey } = buildCiteOrder(content);
+    const body = content.sections.map((s) => this.jatsSection(s, numByKey)).join('');
+    const abstract = content.abstract
+      ? `<abstract><p>${escapeXml(resolveCites(content.abstract, numByKey))}</p></abstract>`
+      : '';
+    const back = order.length
+      ? '<back><ref-list>' +
+        order
+          .map((key, i) => {
+            const ref = (content.references ?? []).find((r) => r.key === key);
+            return ref
+              ? `<ref id="ref-${escapeXml(ref.key)}"><label>${i + 1}</label><mixed-citation>${escapeXml(plainRef(ref))}</mixed-citation></ref>`
+              : '';
+          })
+          .join('') +
+        '</ref-list></back>'
+      : '';
     return (
       '<?xml version="1.0" encoding="UTF-8"?>' +
       '<article>' +
       '<front><article-meta><title-group>' +
       `<article-title>${escapeXml(content.title)}</article-title>` +
-      '</title-group></article-meta></front>' +
+      '</title-group>' +
+      abstract +
+      '</article-meta></front>' +
       `<body>${body}</body>` +
+      back +
       '</article>'
     );
   }
 
-  private jatsSection(section: ContentSection): string {
+  private jatsSection(section: ContentSection, numByKey: Record<string, number>): string {
     const title = `<title>${escapeXml(section.title ?? section.path)}</title>`;
     const paras = section.blocks
-      .map((b) => this.blockText(b))
+      .map((b) => this.blockText(b, numByKey))
       .filter((t): t is string => t !== null)
       .map((t) => `<p>${escapeXml(t)}</p>`)
       .join('');
@@ -175,13 +267,22 @@ export class ExportService {
    * packaging. The title and each block become a <w:p> paragraph.
    */
   renderDocx(content: KnowledgeObjectContent): string {
+    const { order, numByKey } = buildCiteOrder(content);
     const paras: string[] = [this.wordPara(content.title)];
+    if (content.abstract) paras.push(this.wordPara('Abstract. ' + resolveCites(content.abstract, numByKey)));
     for (const section of content.sections) {
       paras.push(this.wordPara(section.title ?? section.path));
       for (const block of section.blocks) {
-        const text = this.blockText(block);
+        const text = this.blockText(block, numByKey);
         if (text !== null) paras.push(this.wordPara(text));
       }
+    }
+    if (order.length) {
+      paras.push(this.wordPara('References'));
+      order.forEach((key, i) => {
+        const ref = (content.references ?? []).find((r) => r.key === key);
+        if (ref) paras.push(this.wordPara(`[${i + 1}] ${plainRef(ref)}`));
+      });
     }
     return (
       '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
@@ -195,11 +296,9 @@ export class ExportService {
     return `<w:p><w:r><w:t xml:space="preserve">${escapeXml(text)}</w:t></w:r></w:p>`;
   }
 
-  /** Reader-facing text for a block (paragraph text or surface caption), else null. */
-  private blockText(block: ContentBlock): string | null {
-    if (block.type === 'figure' || block.type === 'caption') {
-      return surfaceCaption(block) ?? block.text ?? null;
-    }
-    return block.text ?? null;
+  /** Reader-facing text for a block (paragraph/claim text or surface caption), else null. */
+  private blockText(block: ContentBlock, numByKey: Record<string, number>): string | null {
+    const raw = block.type === 'figure' || block.type === 'caption' ? surfaceCaption(block) ?? block.text : block.text;
+    return raw != null ? resolveCites(raw, numByKey) : null;
   }
 }
