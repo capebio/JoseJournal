@@ -72,11 +72,15 @@ export function Reader() {
     queryFn: () => (verId ? ep.getVersion(koId, verId, { depth: lens.depth, register: lens.register, lang: lens.lang }) : ep.getReadModel(koId, { depth: lens.depth, register: lens.register, lang: lens.lang })),
     enabled: !!koId,
   });
+  // history feeds the visible version chrome (chip label, DAG, banner) — keep eager.
   const historyQ = useQuery({ queryKey: qk.history(koId), queryFn: () => ep.getHistory(koId), enabled: !!koId });
-  const reviewsQ = useQuery({ queryKey: qk.reviews(koId), queryFn: () => ep.getReviews(koId), enabled: !!koId });
-  const provQ = useQuery({ queryKey: qk.provenance(koId), queryFn: () => ep.getProvenance(koId), enabled: !!koId });
-  const mapQ = useQuery({ queryKey: qk.map(koId), queryFn: () => ep.getMap(koId), enabled: !!koId });
-  const aiQ = useQuery({ queryKey: qk.aiDecl(koId), queryFn: () => ep.getAiDeclaration(koId), enabled: !!koId && lens.annotations.ai });
+  // Supplementary panels (reviewer annotations, provenance overlay, map count) are
+  // deferred until the read resolves so they don't compete with the critical read
+  // for bandwidth on a slow connection (FE9 low-bandwidth; first paint is gated on readQ).
+  const reviewsQ = useQuery({ queryKey: qk.reviews(koId), queryFn: () => ep.getReviews(koId), enabled: !!koId && !!readQ.data });
+  const provQ = useQuery({ queryKey: qk.provenance(koId), queryFn: () => ep.getProvenance(koId), enabled: !!koId && !!readQ.data });
+  const mapQ = useQuery({ queryKey: qk.map(koId), queryFn: () => ep.getMap(koId), enabled: !!koId && !!readQ.data });
+  const aiQ = useQuery({ queryKey: qk.aiDecl(koId), queryFn: () => ep.getAiDeclaration(koId), enabled: !!koId && lens.annotations.ai && !!readQ.data });
 
   const versions: VersionEntry[] = useMemo(
     () => (historyQ.data ?? []).map((v) => ({ _id: v._id, status: v.status, createdAt: v.createdAt, doi: v.doi })),
