@@ -5,7 +5,7 @@
 import { api, apiStatus } from './client';
 import type { LensState } from '../lens/lens-url';
 import type {
-  AccessGrant, AiDeclaration, CiteResult, CoauthorConsent, KnowledgeObjectContent, KnowledgeObjectEntity,
+  AccessGrant, AiDeclaration, CiteResult, CoauthorConsent, DeskView, KnowledgeObjectContent, KnowledgeObjectEntity,
   MediaObjectMeta, NomName, ObservationPublic, ProvenanceEvent, ReadModel, ReviewThread, ReviewerDisposition,
   SearchDoc, SnippetAnchor, SnippetResolution, TaxonConcept, Tier, VersionDoc, Visibility,
 } from './types';
@@ -105,3 +105,6 @@ export const search = (q: { text?: string; koType?: string; status?: string; ind
 
 // ── Federation (read connectors) ────────────────────────────────────────────
 export const federationTaxon = (name: string) => api(`/federation/taxon?name=${enc(name)}`);
+
+// ── Desk (M7 per-user aggregation) ──────────────────────────────────────────
+export const getDesk = () => api<DeskView>(`/desk`);

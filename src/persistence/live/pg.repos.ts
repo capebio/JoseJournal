@@ -373,11 +373,12 @@ export class PgAuditRepo implements AuditRepo {
     );
     return { ...entry, id: r[0].id } as AuditLedgerEntry;
   }
-  async list(filter?: { objectRef?: string; action?: string }) {
+  async list(filter?: { objectRef?: string; action?: string; actorRef?: string }) {
     const clauses: string[] = [];
     const params: unknown[] = [];
     if (filter?.objectRef) { params.push(filter.objectRef); clauses.push(`object_ref=$${params.length}`); }
     if (filter?.action) { params.push(filter.action); clauses.push(`action=$${params.length}`); }
+    if (filter?.actorRef) { params.push(filter.actorRef); clauses.push(`actor_ref=$${params.length}`); }
     const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
     const rows = await this.pg.query(`SELECT * FROM audit_ledger ${where} ORDER BY id`, params);
     return rows.map((r: any) => ({ id: r.id, ts: r.ts?.toISOString?.() ?? r.ts, actorRef: r.actor_ref, action: r.action, objectRef: r.object_ref, disclosure: r.disclosure, detail: r.detail }));

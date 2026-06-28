@@ -19,6 +19,7 @@ import { ExportModule } from '@modules/export/export.module';
 import { AuthoringModule } from '@modules/authoring/authoring.module';
 import { SearchModule } from '@modules/search/search.module';
 import { AuthModule } from '@modules/auth/auth.module';
+import { DeskModule } from '@modules/desk/desk.module';
 
 /**
  * The JOSE v1 modular monolith — one deployable, cleanly partitioned so any
@@ -44,6 +45,7 @@ import { AuthModule } from '@modules/auth/auth.module';
     AuthoringModule,
     SearchModule,
     AuthModule,
+    DeskModule,
   ],
 })
 export class AppModule {}

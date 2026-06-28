@@ -178,7 +178,7 @@ export interface MediaRepo {
 // ── Postgres: append-only audit ledger ───────────────────────────────────────
 export interface AuditRepo {
   append(entry: Omit<AuditLedgerEntry, 'id'>): Promise<AuditLedgerEntry>;
-  list(filter?: { objectRef?: string; action?: string }): Promise<AuditLedgerEntry[]>;
+  list(filter?: { objectRef?: string; action?: string; actorRef?: string }): Promise<AuditLedgerEntry[]>;
 }
 
 // ── Postgres: AI provenance declarations ─────────────────────────────────────

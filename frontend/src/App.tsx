@@ -9,6 +9,7 @@ import { Reader } from './screens/Reader';
 
 // Every other screen is route-split so a visitor who only opens the Reader does
 // not download the Builder, map, review, etc. on first load (FE9 low-bandwidth).
+const Desk = lazy(() => import('./screens/Desk').then((m) => ({ default: m.Desk })));
 const DoiResolver = lazy(() => import('./screens/DoiResolver').then((m) => ({ default: m.DoiResolver })));
 const Discovery = lazy(() => import('./screens/Discovery').then((m) => ({ default: m.Discovery })));
 const Builder = lazy(() => import('./screens/Builder').then((m) => ({ default: m.Builder })));
@@ -34,7 +35,8 @@ export default function App() {
     <AppShell>
       <Suspense fallback={<div className="jose-loading">Loading…</div>}>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Navigate to="/desk" replace />} />
+        <Route path="/desk" element={<Desk />} />
         <Route path="/reader" element={<Home />} />
         <Route path="/ko/:koId" element={<Reader />} />
         <Route path="/ko/:koId/v/:verId" element={<Reader />} />

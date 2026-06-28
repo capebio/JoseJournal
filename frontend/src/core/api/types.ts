@@ -136,4 +136,17 @@ export interface AccessGrant {
   grantedAt: string; expiresAt: string; revokedAt?: string | null; offlinePkg: boolean;
 }
 export interface NomName { id: string; nameString: string; authorship?: string | null; rank?: string | null; code?: string | null }
+
+// ── M7 Desk (read-only per-user aggregation) ─────────────────────────────────
+export type DeskLifecycle = 'draft' | 'under-review' | 'published';
+export interface DeskObject { koId: string; title: string; lifecycle: DeskLifecycle; tier: string; status: string }
+export interface DeskAttention { kind: 'review-reply' | 'coauthor-confirm' | 'verify-obs'; koId: string; title: string; detail: string; route: string }
+export interface DeskFeedItem { id: number; ts: string; action: string; objectRef: string | null }
+export interface DeskView {
+  account: string;
+  objects: DeskObject[];
+  attention: DeskAttention[];
+  feed: DeskFeedItem[];
+  stats: { objects: number; published: number; underReview: number; attention: number };
+}
 export interface TaxonConcept { id: string; nameId: string; secVersion: string; circumscription?: Record<string, unknown> | null; createdAt: string }

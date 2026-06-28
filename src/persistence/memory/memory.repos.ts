@@ -331,9 +331,14 @@ export class MemoryAuditRepo implements AuditRepo {
     this.db.audit.push(e); // INSERT-only
     return clone(e);
   }
-  async list(filter?: { objectRef?: string; action?: string }) {
+  async list(filter?: { objectRef?: string; action?: string; actorRef?: string }) {
     return this.db.audit
-      .filter((e) => (!filter?.objectRef || e.objectRef === filter.objectRef) && (!filter?.action || e.action === filter.action))
+      .filter(
+        (e) =>
+          (!filter?.objectRef || e.objectRef === filter.objectRef) &&
+          (!filter?.action || e.action === filter.action) &&
+          (!filter?.actorRef || e.actorRef === filter.actorRef),
+      )
       .map(clone);
   }
 }

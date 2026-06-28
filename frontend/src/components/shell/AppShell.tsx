@@ -4,6 +4,7 @@ import { useAuth, QUICK_LOGINS } from '../../core/auth/auth';
 import { useOnline } from '../../core/offline/offline';
 
 const NAV = [
+  { to: '/desk', label: 'Desk', ic: '◳' },
   { to: '/explore', label: 'Discovery', ic: '◎' },
   { to: '/reader', label: 'Reader', ic: '❑' },
   { to: '/builder', label: 'Builder', ic: '✎' },
