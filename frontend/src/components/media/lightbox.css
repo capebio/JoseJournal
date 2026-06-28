@@ -97,7 +97,7 @@
 .lb-links { display: flex; gap: 10px; flex-wrap: wrap; }
 .lb-link {
   display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
-  border: 1px solid var(--rule); background: #fff; border-radius: 8px; padding: 9px 13px;
+  border: 1px solid var(--rule); background: var(--surface); border-radius: 8px; padding: 9px 13px;
   font-family: var(--ui); font-size: 13px; color: var(--ink);
 }
 .lb-link:hover { background: var(--haze); }

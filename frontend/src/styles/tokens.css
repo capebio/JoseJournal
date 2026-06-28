@@ -3,6 +3,9 @@
 
 .jose {
   --paper: #f6f8f5;
+  /* Raised surfaces (cards, popovers, inputs, chips) — a theming hook distinct
+     from --paper. White text on accents stays #fff (a separate concern). */
+  --surface: #fff;
   --ink: #18201b;
   --sub: #4a5650;
   /* --structure darkened to ~4.6:1 on --paper so small label/placeholder text meets WCAG AA (was #6e7c70 ≈ 4.11:1). */

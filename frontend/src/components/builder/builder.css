@@ -8,11 +8,11 @@
 .bld-title::placeholder { color: var(--structure); }
 
 .bld-pill { position: relative; }
-.bld-pillbtn { font-family: var(--ui); font-size: 12px; border: 1px solid var(--rule); background: #fff; border-radius: 6px; padding: 6px 10px; color: var(--sub); display: inline-flex; gap: 7px; align-items: center; }
+.bld-pillbtn { font-family: var(--ui); font-size: 12px; border: 1px solid var(--rule); background: var(--surface); border-radius: 6px; padding: 6px 10px; color: var(--sub); display: inline-flex; gap: 7px; align-items: center; }
 .bld-pillbtn .d { width: 7px; height: 7px; border-radius: 50%; background: var(--structure); }
 .bld-pillbtn.commons .d { background: var(--verified); }
 .bld-pillbtn.ai { color: var(--ai-ink); border-color: var(--ai-border); }
-.bld-menu { position: absolute; top: 36px; left: 0; background: #fff; border: 1px solid var(--rule); border-radius: 8px; box-shadow: 0 12px 30px rgba(24, 32, 27, 0.14); padding: 6px; min-width: 180px; z-index: 40; }
+.bld-menu { position: absolute; top: 36px; left: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; box-shadow: 0 12px 30px rgba(24, 32, 27, 0.14); padding: 6px; min-width: 180px; z-index: 40; }
 .bld-menu button { width: 100%; text-align: left; border: 0; background: transparent; font-family: var(--ui); font-size: 12.5px; color: var(--ink); padding: 8px 10px; border-radius: 6px; }
 .bld-menu button:hover { background: var(--haze); }
 .bld-menu .sub { font-size: 10px; color: var(--structure); padding: 6px 10px 4px; letter-spacing: 0.08em; text-transform: uppercase; }
@@ -22,7 +22,7 @@
 
 .bld-seg { position: relative; margin: 0 0 4px; border-radius: 7px; }
 .bld-seg textarea { width: 100%; font-family: var(--body); font-size: 17px; line-height: 1.55; color: var(--ink); border: 0; background: transparent; resize: none; padding: 9px 11px; border-radius: 7px; overflow: hidden; display: block; }
-.bld-seg textarea:focus { background: #fff; box-shadow: 0 0 0 1px var(--rule); outline: none; }
+.bld-seg textarea:focus { background: var(--surface); box-shadow: 0 0 0 1px var(--rule); outline: none; }
 .bld-seg.v-ai textarea { background: var(--ai-bg); }
 .bld-seg.v-aih textarea { background: var(--aih-bg); }
 .bld-seg.v-human textarea { background: var(--haze); }
@@ -36,17 +36,17 @@
 
 .bld-segtools { display: flex; gap: 6px; padding: 1px 11px 6px; opacity: 0; transition: opacity 0.12s; }
 .bld-seg:hover .bld-segtools, .bld-seg:focus-within .bld-segtools { opacity: 1; }
-.bld-segtools button { font-family: var(--ui); font-size: 11px; color: var(--sub); border: 1px solid var(--rule); background: #fff; border-radius: 5px; padding: 3px 8px; }
+.bld-segtools button { font-family: var(--ui); font-size: 11px; color: var(--sub); border: 1px solid var(--rule); background: var(--surface); border-radius: 5px; padding: 3px 8px; }
 .bld-segtools button.ai { color: var(--ai-ink); }
 .bld-segtools button .sp { color: var(--type-red); }
 
 .bld-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--rule); }
-.bld-tbtn { font-family: var(--ui); font-size: 12.5px; border: 1px solid var(--rule); background: #fff; border-radius: 7px; padding: 7px 12px; color: var(--ink); display: inline-flex; gap: 7px; align-items: center; position: relative; }
+.bld-tbtn { font-family: var(--ui); font-size: 12.5px; border: 1px solid var(--rule); background: var(--surface); border-radius: 7px; padding: 7px 12px; color: var(--ink); display: inline-flex; gap: 7px; align-items: center; position: relative; }
 .bld-tbtn.ai { border-color: var(--ai-border); color: var(--ai-ink); }
 .bld-tbtn .sp { color: var(--type-red); }
 
 /* AI-view legend (the ◫ AI content view, AC 11.7) */
-.bld-ailegend { font-family: var(--ui); font-size: 11px; color: var(--sub); display: flex; gap: 14px; align-items: center; flex-wrap: wrap; padding: 7px 22px; border-bottom: 1px dashed var(--rule); background: #fff; }
+.bld-ailegend { font-family: var(--ui); font-size: 11px; color: var(--sub); display: flex; gap: 14px; align-items: center; flex-wrap: wrap; padding: 7px 22px; border-bottom: 1px dashed var(--rule); background: var(--surface); }
 .bld-ailegend i { width: 13px; height: 13px; border-radius: 3px; display: inline-block; margin-right: 5px; vertical-align: -2px; }
 
 /* authorship + export rail */
@@ -70,13 +70,13 @@
 .bld-drow .v { color: var(--ink); flex: 1; min-width: 0; word-break: break-word; }
 .bld-rolechip { display: inline-block; font-size: 11px; background: var(--haze); color: var(--sub); border-radius: 5px; padding: 2px 8px; margin: 0 5px 5px 0; }
 .bld-model { font-family: var(--mono); font-size: 11.5px; color: var(--ink); }
-.bld-modelin { font-family: var(--mono); font-size: 11.5px; color: var(--ink); border: 1px solid var(--rule); border-radius: 6px; padding: 4px 8px; background: #fff; width: 100%; }
+.bld-modelin { font-family: var(--mono); font-size: 11.5px; color: var(--ink); border: 1px solid var(--rule); border-radius: 6px; padding: 4px 8px; background: var(--surface); width: 100%; }
 
 .bld-export { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 6px; }
-.bld-export button { font-family: var(--ui); font-size: 11.5px; border: 1px solid var(--rule); background: #fff; border-radius: 6px; padding: 6px 11px; color: var(--ink); }
+.bld-export button { font-family: var(--ui); font-size: 11.5px; border: 1px solid var(--rule); background: var(--surface); border-radius: 6px; padding: 6px 11px; color: var(--ink); }
 
 .bld-foot { position: sticky; bottom: 0; background: var(--paper); border-top: 1px solid var(--rule); padding: 13px 26px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; z-index: 25; }
-.bld-foot button { font-family: var(--ui); font-size: 13px; border-radius: 8px; padding: 9px 16px; border: 1px solid var(--rule); background: #fff; color: var(--ink); font-weight: 500; }
+.bld-foot button { font-family: var(--ui); font-size: 13px; border-radius: 8px; padding: 9px 16px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); font-weight: 500; }
 .bld-foot button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 .bld-foot button:disabled { opacity: 0.5; cursor: not-allowed; }
 .bld-foot .koid { font-family: var(--mono); font-size: 11px; color: var(--sub); }
@@ -86,7 +86,7 @@
 
 /* header: Write/Preview mode segmented control */
 .bld-modeseg { display: inline-flex; border: 1px solid var(--rule); border-radius: 7px; overflow: hidden; }
-.bld-modeseg button { border: 0; background: #fff; padding: 6px 14px; font-size: 12.5px; color: var(--sub); font-family: var(--ui); }
+.bld-modeseg button { border: 0; background: var(--surface); padding: 6px 14px; font-size: 12.5px; color: var(--sub); font-family: var(--ui); }
 .bld-modeseg button[aria-pressed='true'] { background: var(--ink); color: var(--paper); }
 
 /* toolbar additions */
@@ -106,7 +106,7 @@
 .bld-block { position: relative; margin: 0 0 3px; }
 .bld-para, .bld-figcap { width: 100%; font-family: var(--body); font-size: 16.5px; line-height: 1.6; color: var(--ink); border: 0; background: transparent; resize: none; padding: 7px 9px; border-radius: 6px; display: block; overflow: hidden; }
 .bld-figcap { font-family: var(--ui); font-size: 12.5px; color: var(--sub); }
-.bld-para:focus, .bld-figcap:focus { background: #fff; box-shadow: 0 0 0 1px var(--rule); outline: none; }
+.bld-para:focus, .bld-figcap:focus { background: var(--surface); box-shadow: 0 0 0 1px var(--rule); outline: none; }
 .bld-block.v-ai .bld-para { background: var(--ai-bg); }
 .bld-block.v-aih .bld-para { background: var(--aih-bg); }
 .bld-block.claim .bld-para { border-left: 3px solid var(--type-red); background: var(--type-red-wash); }
@@ -117,12 +117,12 @@
 
 .bld-blocktools { position: absolute; right: 6px; top: -8px; display: flex; gap: 5px; opacity: 0; transition: opacity 0.12s; z-index: 3; }
 .bld-block:hover .bld-blocktools, .bld-block:focus-within .bld-blocktools { opacity: 1; }
-.bld-blocktools button { font-family: var(--ui); font-size: 10.5px; color: var(--sub); border: 1px solid var(--rule); background: #fff; border-radius: 5px; padding: 2px 7px; }
+.bld-blocktools button { font-family: var(--ui); font-size: 10.5px; color: var(--sub); border: 1px solid var(--rule); background: var(--surface); border-radius: 5px; padding: 2px 7px; }
 .bld-blocktools button.ai { color: var(--ai-ink); }
 .bld-block .bld-segtag { left: 9px; right: auto; }
 
 .bld-addrow { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--rule); }
-.bld-addbtn { font-family: var(--ui); font-size: 12.5px; border: 1px solid var(--rule); background: #fff; border-radius: 7px; padding: 7px 11px; color: var(--ink); }
+.bld-addbtn { font-family: var(--ui); font-size: 12.5px; border: 1px solid var(--rule); background: var(--surface); border-radius: 7px; padding: 7px 11px; color: var(--ink); }
 .bld-addbtn.ai { border-color: var(--ai-border); color: var(--ai-ink); }
 
 /* preview render */
@@ -157,10 +157,10 @@
 .bld-stylewrap { display: flex; align-items: center; gap: 9px; margin-bottom: 14px; }
 .bld-stylewrap .lab { font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--structure); }
 .bld-stoggle { display: inline-flex; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
-.bld-stoggle button { border: 0; background: #fff; font-family: var(--ui); font-size: 11px; padding: 5px 10px; color: var(--sub); }
+.bld-stoggle button { border: 0; background: var(--surface); font-family: var(--ui); font-size: 11px; padding: 5px 10px; color: var(--sub); }
 .bld-stoggle button[aria-pressed='true'] { background: var(--ink); color: var(--paper); }
-.bld-addref { width: 100%; font-family: var(--ui); font-size: 12.5px; border: 1px dashed var(--rule); background: #fff; border-radius: 8px; padding: 10px; color: var(--ink); margin-bottom: 14px; }
-.bld-refcard { border: 1px solid var(--rule); border-radius: 8px; padding: 11px 12px; margin-bottom: 9px; background: #fff; }
+.bld-addref { width: 100%; font-family: var(--ui); font-size: 12.5px; border: 1px dashed var(--rule); background: var(--surface); border-radius: 8px; padding: 10px; color: var(--ink); margin-bottom: 14px; }
+.bld-refcard { border: 1px solid var(--rule); border-radius: 8px; padding: 11px 12px; margin-bottom: 9px; background: var(--surface); }
 .bld-refcard .rtop { display: flex; align-items: center; gap: 7px; }
 .bld-refcard .rt { font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: #fff; background: var(--structure); border-radius: 4px; padding: 1px 6px; }
 .bld-refcard .rt.jose { background: var(--verified); }
@@ -171,12 +171,12 @@
 .bld-refcard .rfoot { display: flex; align-items: center; gap: 10px; margin-top: 9px; }
 .bld-refcard .used { font-family: var(--mono); font-size: 10.5px; color: var(--structure); }
 .bld-refcard .used.zero { color: var(--caution); }
-.bld-refcard .ins { margin-left: auto; font-family: var(--ui); font-size: 11px; border: 1px solid var(--rule); background: #fff; border-radius: 5px; padding: 4px 10px; color: var(--type-red); font-weight: 500; }
+.bld-refcard .ins { margin-left: auto; font-family: var(--ui); font-size: 11px; border: 1px solid var(--rule); background: var(--surface); border-radius: 5px; padding: 4px 10px; color: var(--type-red); font-weight: 500; }
 
 /* CitePicker modal */
 .bld-pick-back { position: fixed; inset: 0; background: rgba(20, 28, 22, 0.34); z-index: 80; display: flex; align-items: flex-start; justify-content: center; padding-top: 8vh; }
-.bld-pick { width: min(560px, 94vw); max-height: 82vh; overflow: auto; background: #fff; border: 1px solid var(--rule); border-radius: 12px; box-shadow: 0 24px 64px rgba(20, 28, 22, 0.32); }
-.bld-pick-h { display: flex; align-items: center; gap: 10px; padding: 15px 18px; border-bottom: 1px solid var(--rule); position: sticky; top: 0; background: #fff; z-index: 2; }
+.bld-pick { width: min(560px, 94vw); max-height: 82vh; overflow: auto; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; box-shadow: 0 24px 64px rgba(20, 28, 22, 0.32); }
+.bld-pick-h { display: flex; align-items: center; gap: 10px; padding: 15px 18px; border-bottom: 1px solid var(--rule); position: sticky; top: 0; background: var(--surface); z-index: 2; }
 .bld-pick-h h4 { font-family: var(--ui); font-size: 14px; margin: 0; flex: 1; }
 .bld-pick-h .x { border: 0; background: transparent; font-size: 20px; line-height: 1; color: var(--structure); cursor: pointer; }
 .bld-pick-sec { padding: 14px 18px; }
@@ -191,10 +191,10 @@
 .bld-empty { font-family: var(--ui); font-size: 12.5px; color: var(--structure); padding: 8px 10px; }
 .bld-methods { display: flex; gap: 7px; flex-wrap: wrap; padding: 14px 18px 4px; border-top: 1px solid var(--rule); }
 .bld-methlab { width: 100%; font-family: var(--ui); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--structure); margin-bottom: 2px; }
-.bld-method { font-family: var(--ui); font-size: 12px; border: 1px solid var(--rule); background: #fff; border-radius: 7px; padding: 7px 11px; color: var(--ink); }
+.bld-method { font-family: var(--ui); font-size: 12px; border: 1px solid var(--rule); background: var(--surface); border-radius: 7px; padding: 7px 11px; color: var(--ink); }
 .bld-method[aria-pressed='true'] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 .bld-form { padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 9px; }
-.bld-form input { font-family: var(--ui); font-size: 13px; padding: 9px 10px; border: 1px solid var(--rule); border-radius: 7px; width: 100%; background: #fff; color: var(--ink); }
+.bld-form input { font-family: var(--ui); font-size: 13px; padding: 9px 10px; border: 1px solid var(--rule); border-radius: 7px; width: 100%; background: var(--surface); color: var(--ink); }
 .bld-form input:focus { outline: none; box-shadow: 0 0 0 1px var(--type-red); border-color: var(--type-red); }
 .bld-form .row2 { display: flex; gap: 9px; }
 .bld-form .go { font-family: var(--ui); font-size: 13px; font-weight: 600; background: var(--ink); color: var(--paper); border: 0; border-radius: 8px; padding: 11px; cursor: pointer; }
@@ -204,7 +204,7 @@
 .bld-josecard .jt i { font-style: italic; }
 .bld-josecard .jcoord { font-family: var(--mono); font-size: 10.5px; color: var(--structure); margin-top: 4px; }
 .bld-josecard .jv { display: flex; gap: 7px; margin-top: 8px; }
-.bld-josecard .jv button { font-family: var(--ui); font-size: 11.5px; border: 1px solid var(--rule); background: #fff; border-radius: 6px; padding: 5px 10px; color: var(--ink); }
+.bld-josecard .jv button { font-family: var(--ui); font-size: 11.5px; border: 1px solid var(--rule); background: var(--surface); border-radius: 6px; padding: 5px 10px; color: var(--ink); }
 .bld-josecard .jv button.vor { border-color: #bcd9cd; color: var(--verified); }
 
 @media (max-width: 880px) {

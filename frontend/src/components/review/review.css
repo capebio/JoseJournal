@@ -10,9 +10,9 @@
 
 /* the per-thread action area (reviewer disposition editor / author reply box) */
 .jose-rev .act { margin-top: 9px; padding-top: 9px; border-top: 1px dashed var(--rule); }
-.jose-rev .act textarea { width: 100%; box-sizing: border-box; font-family: var(--ui); font-size: 12.5px; color: var(--ink); border: 1px solid var(--rule); border-radius: 7px; padding: 7px 9px; background: #fff; resize: vertical; min-height: 44px; }
+.jose-rev .act textarea { width: 100%; box-sizing: border-box; font-family: var(--ui); font-size: 12.5px; color: var(--ink); border: 1px solid var(--rule); border-radius: 7px; padding: 7px 9px; background: var(--surface); resize: vertical; min-height: 44px; }
 .jose-rev .act .seg { display: inline-flex; gap: 4px; margin-bottom: 7px; flex-wrap: wrap; }
-.jose-rev .act .seg button { font-family: var(--ui); font-size: 9.5px; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid var(--rule); background: #fff; color: var(--sub); border-radius: 5px; padding: 3px 8px; cursor: pointer; }
+.jose-rev .act .seg button { font-family: var(--ui); font-size: 9.5px; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid var(--rule); background: var(--surface); color: var(--sub); border-radius: 5px; padding: 3px 8px; cursor: pointer; }
 .jose-rev .act .seg button.on.green { background: var(--verified); color: #fff; border-color: var(--verified); }
 .jose-rev .act .seg button.on.yellow { background: #b8a93e; color: var(--on-warn-ink); border-color: #b8a93e; }
 .jose-rev .act .seg button.on.orange { background: #c8772a; color: var(--on-warn-ink); border-color: #c8772a; }
@@ -34,7 +34,7 @@
 /* named-unconfirmed MUST read as provisional, never as confirmed — type-red marker (§3 annotation) */
 .jose-coauthor .cstate.named-unconfirmed { background: var(--type-red-wash); border-color: var(--type-red); color: var(--type-red); }
 .jose-coauthor .resp { margin-left: auto; display: flex; gap: 5px; }
-.jose-coauthor .resp button { font-family: var(--ui); font-size: 10.5px; border: 1px solid var(--rule); background: #fff; color: var(--ink); border-radius: 6px; padding: 4px 9px; cursor: pointer; }
+.jose-coauthor .resp button { font-family: var(--ui); font-size: 10.5px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); border-radius: 6px; padding: 4px 9px; cursor: pointer; }
 
 /* release gate card */
 .jose-release .reason { font-family: var(--ui); font-size: 12px; color: var(--type-red); margin-top: 9px; display: flex; gap: 6px; align-items: flex-start; }
@@ -48,7 +48,7 @@
 .jose-revempty { font-family: var(--ui); font-size: 12.5px; color: var(--sub); padding: 6px 0; }
 
 /* Release-readiness card (prototype 3.jsx) — explicit ✓/✗ gate + co-author warn. */
-.rr-card { position: sticky; top: 84px; border: 1px solid var(--rule); border-radius: 12px; padding: 16px; background: #fff; margin-top: 14px; }
+.rr-card { position: sticky; top: 84px; border: 1px solid var(--rule); border-radius: 12px; padding: 16px; background: var(--surface); margin-top: 14px; }
 .rr-h { font-family: var(--ui); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--structure); margin: 0 0 13px; }
 .rr-check { display: flex; gap: 9px; align-items: flex-start; font-family: var(--ui); font-size: 12.5px; color: var(--ink); padding: 8px 0; border-top: 1px solid var(--haze); }
 .rr-check .mk { flex: none; width: 16px; font-weight: 700; }

@@ -25,7 +25,7 @@
 .jp-rungs { list-style: none; margin: 0; padding: 0; }
 .jp-rung { display: flex; gap: 13px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--rule); }
 .jp-rung:first-child { border-top: 0; }
-.jp-rung-dot { width: 26px; height: 26px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center; font-family: var(--ui); font-size: 12px; font-weight: 600; border: 2px solid var(--rule); color: var(--structure); background: #fff; }
+.jp-rung-dot { width: 26px; height: 26px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center; font-family: var(--ui); font-size: 12px; font-weight: 600; border: 2px solid var(--rule); color: var(--structure); background: var(--surface); }
 .jp-rung.past .jp-rung-dot { background: var(--verified); border-color: var(--verified); color: #fff; }
 .jp-rung.current .jp-rung-dot { border-color: var(--verified); color: var(--verified); box-shadow: 0 0 0 4px #eef5f2; }
 .jp-rung.future { opacity: 0.6; }
@@ -48,7 +48,7 @@
 .jp-vouch-progress { display: inline-flex; align-items: center; gap: 7px; margin-top: 4px; }
 .jp-vouch-progress .dot { width: 11px; height: 11px; border-radius: 50%; border: 2px solid var(--rule); }
 .jp-vouch-progress .dot.on { background: var(--verified); border-color: var(--verified); }
-.jp-vouch-progress .dot.off { background: #fff; }
+.jp-vouch-progress .dot.off { background: var(--surface); }
 .jp-vouch-text { font-family: var(--mono); font-size: 11px; color: var(--sub); margin-left: 3px; }
 
 /* ---- Record curator ---- */

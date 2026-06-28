@@ -5,7 +5,7 @@
 .mp-h-title i { font-style: italic; }
 .mp-prec { display: inline-flex; align-items: center; gap: 9px; font-family: var(--ui); font-size: 11px; color: var(--structure); }
 .mp-seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
-.mp-seg button { border: 0; background: #fff; padding: 5px 11px; font-size: 12px; color: var(--sub); display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+.mp-seg button { border: 0; background: var(--surface); padding: 5px 11px; font-size: 12px; color: var(--sub); display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
 .mp-seg button[aria-pressed='true'] { background: var(--ink); color: var(--paper); }
 .mp-seg button.locked { color: var(--structure); }
 .mp-grant { margin-left: auto; font-family: var(--ui); font-size: 11.5px; color: var(--type-red); border: 1px solid #e3b7af; background: var(--type-red-wash); border-radius: 20px; padding: 4px 12px; display: inline-flex; align-items: center; gap: 8px; }
@@ -25,21 +25,21 @@
 .mp-rail { padding: 24px 22px; font-family: var(--ui); }
 .mp-rh { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--structure); margin: 0 0 6px; }
 .mp-rsub { font-size: 11px; color: var(--sub); margin-bottom: 16px; }
-.po-card { border: 1px solid var(--rule); border-radius: 9px; padding: 12px; margin-bottom: 11px; background: #fff; }
+.po-card { border: 1px solid var(--rule); border-radius: 9px; padding: 12px; margin-bottom: 11px; background: var(--surface); }
 .po-top { display: flex; align-items: baseline; gap: 8px; }
 .po-id { font-family: var(--mono); font-size: 12px; color: var(--ink); }
 .po-src { font-size: 10.5px; color: #fff; background: var(--structure); border-radius: 4px; padding: 1px 6px; letter-spacing: 0.03em; margin-left: auto; }
 .po-meta { font-size: 11px; color: var(--sub); margin: 6px 0 9px; }
 .po-meta .coord { font-family: var(--mono); }
 .po-acts { display: flex; gap: 7px; }
-.po-acts button { font-family: var(--ui); font-size: 12px; font-weight: 500; border-radius: 6px; padding: 6px 12px; border: 1px solid var(--rule); background: #fff; cursor: pointer; }
+.po-acts button { font-family: var(--ui); font-size: 12px; font-weight: 500; border-radius: 6px; padding: 6px 12px; border: 1px solid var(--rule); background: var(--surface); cursor: pointer; }
 .po-acts .acc { background: var(--verified); color: #fff; border-color: var(--verified); }
 .po-acts .rej { color: var(--type-red); border-color: #e3b7af; }
 .po-reject textarea { width: 100%; font-family: var(--ui); font-size: 12.5px; border: 1px solid var(--rule); border-radius: 7px; padding: 8px; margin-top: 9px; resize: vertical; min-height: 42px; }
 .po-reject textarea:focus { outline: none; box-shadow: 0 0 0 1px var(--type-red); border-color: var(--type-red); }
 .po-reject .need { font-size: 10.5px; color: var(--type-red); margin: 6px 0; }
 .po-reject .row { display: flex; gap: 7px; }
-.po-reject .row button { flex: 1; font-size: 12px; border-radius: 6px; padding: 7px; border: 1px solid var(--rule); background: #fff; cursor: pointer; }
+.po-reject .row button { flex: 1; font-size: 12px; border-radius: 6px; padding: 7px; border: 1px solid var(--rule); background: var(--surface); cursor: pointer; }
 .po-reject .row button.confirm { background: var(--type-red); color: #fff; border-color: var(--type-red); }
 .po-reject .row button:disabled { opacity: 0.5; }
 .po-done { font-family: var(--ui); font-size: 11.5px; color: var(--sub); padding: 9px 2px; border-bottom: 1px solid var(--haze); display: flex; gap: 8px; align-items: center; }
@@ -50,7 +50,7 @@
 .mp-reqcard p { font-family: var(--ui); font-size: 11px; color: var(--sub); margin: 0 0 10px; line-height: 1.5; }
 .mp-reqcard select { width: 100%; font-family: var(--ui); font-size: 12.5px; padding: 7px; border: 1px solid var(--rule); border-radius: 6px; margin-bottom: 10px; }
 .mp-reqcard .row { display: flex; gap: 7px; }
-.mp-reqcard .row button { flex: 1; font-family: var(--ui); font-size: 12px; font-weight: 600; border-radius: 7px; padding: 8px; border: 1px solid var(--rule); background: #fff; cursor: pointer; }
+.mp-reqcard .row button { flex: 1; font-family: var(--ui); font-size: 12px; font-weight: 600; border-radius: 7px; padding: 8px; border: 1px solid var(--rule); background: var(--surface); cursor: pointer; }
 .mp-reqcard .row button.grant { background: var(--ai-ink); color: #fff; border-color: var(--ai-ink); }
 .mp-reqcard .row button:disabled { opacity: 0.5; }
 .mp-open { font-family: var(--ui); font-size: 12.5px; color: var(--sub); border: 1px dashed var(--rule); background: transparent; border-radius: 8px; padding: 9px 13px; width: 100%; margin-top: 18px; cursor: pointer; }
