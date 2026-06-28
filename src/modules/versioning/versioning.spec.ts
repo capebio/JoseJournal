@@ -87,6 +87,20 @@ describe('§9.1 Versioning core (spike gate)', () => {
     expect(v3.doi).toBeNull();
   });
 
+  it('a second VoR supersedes the prior, which stays immutable + retrievable', async () => {
+    const { entity, version } = await ko.createKo({ koType: 'treatment', tier: 'commons', content: sampleContent(), visibility: 'public', actor: ACTOR });
+    const first = await versioning.tagVoR(entity._id, version._id, { ref: 'acct:editor', role: 'editor' });
+    const v3 = await versioning.amend({ koId: entity._id, baseVersionId: first.version._id, content: sampleContent('rev'), actor: ACTOR, amendClass: 'substantive' });
+    const second = await versioning.tagVoR(entity._id, v3._id, { ref: 'acct:editor', role: 'editor' });
+
+    const e = await repo.getEntity(entity._id);
+    expect(e!.refs.vor).toBe(second.version._id);
+    expect(e!.refs.supersededVoR).toBe(first.version._id);
+    const priorVor = await repo.getVersion(first.version._id);
+    expect(priorVor!.status).toBe('vor');
+    expect(priorVor!.doi).toBe(first.doi);
+  });
+
   it('identical content committed twice yields the same ver id (dedup)', async () => {
     const { entity, version } = await ko.createKo({ koType: 'treatment', content: sampleContent('dup'), actor: ACTOR });
     // commit identical content+meta again

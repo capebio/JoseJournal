@@ -283,6 +283,8 @@ export class VersioningService {
       await this.ko.putVersion(version);
 
       const fresh = (await this.ko.getEntity(koId))!;
+      // Keep the prior VoR directly reachable (it stays immutable + retrievable).
+      if (fresh.refs.vor) fresh.refs.supersededVoR = fresh.refs.vor;
       fresh.refs.branches.main = vorVersionId;
       fresh.refs.tip = vorVersionId;
       fresh.refs.vor = vorVersionId;
