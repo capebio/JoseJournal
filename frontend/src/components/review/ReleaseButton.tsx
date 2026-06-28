@@ -63,7 +63,7 @@ export function ReleaseButton({ koId, reviews, coauthors, canRelease, flash, onR
 
   return (
     <div className="rr-card">
-      <h3 className="rr-h">Release readiness</h3>
+      <h2 className="rr-h">Release readiness</h2>
 
       <div className={`rr-check ${gated ? 'no' : 'ok'}`}>
         <span className="mk">{gated ? '✗' : '✓'}</span>

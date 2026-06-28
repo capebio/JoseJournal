@@ -56,7 +56,7 @@ export function RecordCurator({ flash }: { flash: (m: string) => void }) {
 
   return (
     <div className="jose-card jp-curator">
-      <h3>Curate an identity record</h3>
+      <h2>Curate an identity record</h2>
       <p className="jp-curator-lede">
         For a person who cannot hold an account — a deceased author like <b>'L.'</b> (Linnaeus).
         A record is a curated entity, not a login. Linking authority files lets authorship strings resolve.

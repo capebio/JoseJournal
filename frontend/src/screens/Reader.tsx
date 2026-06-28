@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useLens } from '../core/lens/lens-url';
 import { qk } from '../core/query/queryClient';
@@ -7,6 +7,8 @@ import * as ep from '../core/api/endpoints';
 import type { ContentBlock, ReadModel, ReviewThread, VersionDoc } from '../core/api/types';
 import { LensBar, type VersionEntry } from '../components/lens/LensBar';
 import { useToast } from '../components/common/useToast';
+import { useSeed } from '../core/seed';
+import { LightboxModal } from '../components/media/LightboxModal';
 
 /** Parse a heterogeneous evidence ref (IS §3.2) into a labelled row. */
 function evidenceRow(ref: string): { k: string; label: string } {
@@ -18,14 +20,34 @@ function evidenceRow(ref: string): { k: string; label: string } {
   return { k: 'ref', label: ref };
 }
 
+/**
+ * Render an evidence ref against a real target where v1 has one:
+ *   obs:…          → the distribution map (where accepted observations live)
+ *   seq/GenBank    → the NCBI nucleotide record (external)
+ * Everything else (specimen/figure/snippet/generic) stays non-interactive text —
+ * there is no v1 screen for it, so it must not look clickable.
+ */
+function EvidenceRef({ refStr, label, koId }: { refStr: string; label: string; koId: string }) {
+  if (refStr.startsWith('obs:')) {
+    return <Link className="jose-evref link" to={`/map/${encodeURIComponent(koId)}`}>{label}</Link>;
+  }
+  if (refStr.startsWith('seq:') || refStr.includes('GenBank')) {
+    const acc = refStr.match(/[A-Z]{1,3}\d{4,}(?:\.\d+)?/)?.[0];
+    if (acc) {
+      return <a className="jose-evref link" href={`https://www.ncbi.nlm.nih.gov/nuccore/${acc}`} target="_blank" rel="noopener noreferrer">{label}</a>;
+    }
+  }
+  return <span className="jose-evref">{label}</span>;
+}
+
 function QDSMini() {
   const cells = [[1, 0], [2, 1], [0, 2], [2, 2], [3, 1], [1, 3], [3, 3]];
   return (
     <svg width="150" height="92" viewBox="0 0 150 92" style={{ marginTop: 6 }} aria-hidden>
-      {[...Array(5)].map((_, i) => <line key={'v' + i} x1={i * 30} y1="0" x2={i * 30} y2="92" stroke="#D9DED6" />)}
-      {[...Array(4)].map((_, i) => <line key={'h' + i} x1="0" y1={i * 23} x2="150" y2={i * 23} stroke="#D9DED6" />)}
-      {cells.map(([x, y], i) => <rect key={i} x={x * 30 + 3} y={y * 23 + 3} width="24" height="17" fill="#2E6E5E" opacity="0.32" />)}
-      <circle cx="78" cy="40" r="4" fill="#A83A2C" /><circle cx="78" cy="40" r="8" fill="none" stroke="#A83A2C" opacity="0.5" />
+      {[...Array(5)].map((_, i) => <line key={'v' + i} x1={i * 30} y1="0" x2={i * 30} y2="92" style={{ stroke: 'var(--rule)' }} />)}
+      {[...Array(4)].map((_, i) => <line key={'h' + i} x1="0" y1={i * 23} x2="150" y2={i * 23} style={{ stroke: 'var(--rule)' }} />)}
+      {cells.map(([x, y], i) => <rect key={i} x={x * 30 + 3} y={y * 23 + 3} width="24" height="17" style={{ fill: 'var(--verified)' }} opacity="0.32" />)}
+      <circle cx="78" cy="40" r="4" style={{ fill: 'var(--type-red)' }} /><circle cx="78" cy="40" r="8" fill="none" style={{ stroke: 'var(--type-red)' }} opacity="0.5" />
     </svg>
   );
 }
@@ -36,9 +58,11 @@ export function Reader() {
   const navigate = useNavigate();
   const location = useLocation();
   const { flash, node: toastNode } = useToast();
+  const seed = useSeed();
   const bodyRef = useRef<HTMLDivElement>(null);
 
   const [claimsOpen, setClaimsOpen] = useState<Record<string, boolean>>({});
+  const [lightbox, setLightbox] = useState<{ mediaId: string; obsId?: string; caption: string } | null>(null);
   const [citer, setCiter] = useState<{ x: number; y: number; text: string; block: string; section: string } | null>(null);
   const [card, setCard] = useState<{ x: number; y: number; text: string; block: string; section: string; anchor?: { id: string; contentHash: string } } | null>(null);
 
@@ -111,6 +135,15 @@ export function Reader() {
     flash('Citation copied');
   };
 
+  // Escape dismisses the snippet citer / anchor card (keyboard parity with the
+  // outside-click close, and basic dialog behaviour for the anchor card).
+  useEffect(() => {
+    if (!card && !citer) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { setCard(null); setCiter(null); } };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [card, citer]);
+
   if (readQ.isLoading) return <div className="jose-loading">Loading treatment…</div>;
   if (readQ.isError || !readQ.data) {
     const status = (readQ.error as { status?: number })?.status;
@@ -141,7 +174,7 @@ export function Reader() {
         <ProvChip blockId={block.blockId} />
         {block.type === 'figure' ? (
           <div className="jose-fig">
-            <button className="jose-figbox" onClick={() => flash('JXL lightbox — verification zoom is free (FE7)')}>image — {block.captions?.surface ?? 'Fig'} (JXL)</button>
+            <button className="jose-figbox" onClick={() => setLightbox({ mediaId: block.media?.[0] ?? seed?.obsId ?? '', obsId: block.media?.[0] ? undefined : seed?.obsId, caption: block.captions?.surface ?? 'Figure' })}>image — {block.captions?.surface ?? 'Fig'} (JXL)</button>
             <div className="jose-cap">{verbose && block.captions?.verbose ? <span className="vb">{block.captions.verbose}</span> : <>{block.captions?.surface ?? ''}{block.captions?.verbose && <span className="more">+ verbose</span>}</>}</div>
           </div>
         ) : (
@@ -160,7 +193,7 @@ export function Reader() {
               <div className="et">Evidence — {claim.statement}</div>
               {claim.evidence.map((ref, i) => {
                 const row = evidenceRow(ref);
-                return <div key={i} className="jose-ev"><span className="k">{row.k}</span><a href="#" onClick={(e) => e.preventDefault()}>{row.label}</a></div>;
+                return <div key={i} className="jose-ev"><span className="k">{row.k}</span><EvidenceRef refStr={ref} label={row.label} koId={koId} /></div>;
               })}
               <div className="jose-conf">confidence: {claim.confidence}</div>
             </div>
@@ -177,9 +210,9 @@ export function Reader() {
       {showAi && (
         <div className="jose-ailegend">
           <span>AI content view:</span>
-          <span><i style={{ background: '#dfe7e2' }} />human</span>
-          <span><i style={{ background: '#bcd4e2' }} />AI</span>
-          <span><i style={{ background: '#cfe0d6' }} />AI → human</span>
+          <span><i style={{ background: 'var(--haze)' }} />human</span>
+          <span><i style={{ background: 'var(--ai)' }} />AI</span>
+          <span><i style={{ background: 'var(--aih)' }} />AI → human</span>
           {aiQ.data?.status === 200 && <span style={{ marginLeft: 'auto', color: 'var(--verified)' }}>declaration: {aiQ.data.body.coverage}{aiQ.data.body.model ? ` · ${aiQ.data.body.model}` : ''}</span>}
         </div>
       )}
@@ -192,7 +225,7 @@ export function Reader() {
           </div>
         </div>
 
-        <div className="jose-col" ref={bodyRef} onMouseUp={onMouseUp}>
+        <div className="jose-col" ref={bodyRef} onMouseUp={onMouseUp} onKeyUp={onMouseUp}>
           <div className="jose-meta">
             {model.entity.tier === 'commons' && <span className="jose-badge">Commons</span>}
             {model.entity.tier === 'journal' && <span className="jose-badge journal">Journal · VoR</span>}
@@ -204,7 +237,7 @@ export function Reader() {
 
           {v.content.sections.map((section) => (
             <div key={section.path}>
-              <div className="jose-h">{section.title ?? section.path}</div>
+              <h2 className="jose-h">{section.title ?? section.path}</h2>
               {pop && section.path === 'description'
                 ? <div className="jose-block" data-block="blk:pop" data-section="description"><p className="jose-p jose-pop-lead">{section.blocks.find((b) => b.text)?.text}</p></div>
                 : section.blocks.map((b) => renderBlock(b, section.path))}
@@ -213,7 +246,7 @@ export function Reader() {
 
           {showRev && reviews.length > 0 && (
             <>
-              <div className="jose-h">Reviewer annotations</div>
+              <h2 className="jose-h">Reviewer annotations</h2>
               {reviews.map((t: ReviewThread) => (
                 <div key={t.id} className={`jose-rev ${t.disposition}`}>
                   <div className="who"><span className="disp">{t.disposition} · {dispWord(t.disposition)}</span> {t.reviewer.replace('acct:', '')}{typeof t.relevanceScore === 'number' ? ` · relevance ${t.relevanceScore.toFixed(2)}` : ''}</div>
@@ -226,23 +259,25 @@ export function Reader() {
 
           {pop && (
             <div className="jose-news"><h5>In the news</h5>
-              <a href="#" onClick={(e) => e.preventDefault()}>Quartz-field succulents and the poaching crisis <span>· Daily Maverick</span></a>
-              <a href="#" onClick={(e) => e.preventDefault()}>New treatments from the Knersvlakte <span>· SANBI blog</span></a>
+              <span className="newslink">Quartz-field succulents and the poaching crisis <span>· Daily Maverick</span></span>
+              <span className="newslink">New treatments from the Knersvlakte <span>· SANBI blog</span></span>
             </div>
           )}
         </div>
 
         <div className="jose-rail">
-          <h3>Evidence</h3>
-          <button className="jose-railitem"><span className="ic">◰</span><span><span className="t">Distribution (QDS)</span><span className="s">{(mapQ.data?.length ?? 0)} obs</span><div><QDSMini /></div></span></button>
-          <button className="jose-railitem"><span className="ic">▤</span><span><span className="t">Specimens</span><span className="s">vouchers</span></span></button>
-          <button className="jose-railitem"><span className="ic">⛓</span><span><span className="t">Sequences</span><span className="s">GenBank links</span></span></button>
+          <h2>Evidence</h2>
+          <button className="jose-railitem" onClick={() => navigate(`/map/${encodeURIComponent(koId)}`)}>
+            <span className="ic">◰</span><span><span className="t">Distribution (QDS) →</span><span className="s">{(mapQ.data?.length ?? 0)} obs · open map</span><div><QDSMini /></div></span>
+          </button>
+          <div className="jose-railitem static"><span className="ic">▤</span><span><span className="t">Specimens</span><span className="s">vouchers</span></span></div>
+          <div className="jose-railitem static"><span className="ic">⛓</span><span><span className="t">Sequences</span><span className="s">GenBank links</span></span></div>
           <button className={`jose-railitem ${showProv ? 'active' : ''}`} onClick={() => setLens({ annotations: { provenance: !showProv } })}>
             <span className="ic">●</span><span><span className="t">Provenance overlay</span><span className="s">{showProv ? 'on' : 'off'} · {provQ.data?.length ?? 0} events</span></span>
           </button>
-          <button className="jose-railitem">
+          <button className="jose-railitem" onClick={() => goVersion(vorId ?? null)} title="Jump to the Version of Record">
             <span className="ic">⟲</span>
-            <span><span className="t">Versions</span>
+            <span><span className="t">Versions{vorId ? ' → VoR' : ''}</span>
               <div className="jose-vdag">{versions.map((vv, i) => (<span key={vv._id} style={{ display: 'flex', alignItems: 'center' }}>{i > 0 && <span className="ed" />}<span className={`vn ${vv._id === vorId ? 'vor' : ''} ${vv._id === tipId ? 'tip' : ''}`} /></span>))}</div>
               <span className="s">{versions.map((vv, i) => `v${i + 1}`).join(' · ')}</span>
             </span>
@@ -265,7 +300,7 @@ export function Reader() {
         </button>
       )}
       {card && (
-        <div className="jose-citecard" style={{ left: card.x, top: card.y }} onMouseDown={(e) => e.stopPropagation()}>
+        <div className="jose-citecard" role="dialog" aria-modal="true" aria-label="Snippet anchor" style={{ left: card.x, top: card.y }} onMouseDown={(e) => e.stopPropagation()}>
           <h4>Snippet anchor</h4>
           <div className="jose-anchor">
             version <b>{verLabel}</b> · {v.createdAt}<br />
@@ -279,6 +314,16 @@ export function Reader() {
             <button className="primary" onClick={() => copyCite(model)}>Copy citation</button>
           </div>
         </div>
+      )}
+      {lightbox && (
+        <LightboxModal
+          mediaId={lightbox.mediaId}
+          koId={koId}
+          obsId={lightbox.obsId}
+          taxon={v.content.title}
+          caption={lightbox.caption}
+          onClose={() => setLightbox(null)}
+        />
       )}
       {toastNode}
     </div>

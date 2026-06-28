@@ -88,7 +88,7 @@ export function CertificationFlow({
 
   return (
     <div className="jose-card jp-cert">
-      <h3>Certification</h3>
+      <h2>Certification</h2>
       <p className="jp-cert-lede">
         Certification is <b>peer-vetted</b>: an application is endorsed by <b>2 distinct vouches</b>
         {' '}from peers with standing. It unlocks the <i>ability</i> to request precise localities —

@@ -24,10 +24,37 @@ export interface ContentBlock {
   claims?: string[];
   captions?: Partial<Record<DepthVariant, string>>;
   media?: string[];
+  origin?: 'human' | 'ai' | 'ai-human';
   restricted?: boolean;
 }
 export interface ContentSection { path: string; title?: string; blocks: ContentBlock[] }
-export interface KnowledgeObjectContent { title: string; sections: ContentSection[]; claims: Record<string, Claim> }
+/** A manuscript bibliography reference (§5.3). `jose` pins a living object at a version. */
+export interface Reference {
+  id: string;
+  key: string;
+  type: 'article' | 'book' | 'web' | 'jose';
+  short: string;
+  authors: string;
+  year: string;
+  title: string;
+  source?: string;
+  doi?: string | null;
+  jose?: {
+    concept: string;
+    version: string;
+    isVoR: boolean;
+    tip?: string | null;
+    section?: string | null;
+    hash?: string | null;
+  } | null;
+}
+export interface KnowledgeObjectContent {
+  title: string;
+  abstract?: string;
+  sections: ContentSection[];
+  claims: Record<string, Claim>;
+  references?: Reference[];
+}
 
 export interface KnowledgeObjectEntity {
   _id: string;
@@ -82,7 +109,7 @@ export interface SnippetAnchor {
   id: string; versionId: string; sectionPath: string; blockId: string; quotedText: string; contentHash: string;
 }
 export interface SnippetResolution {
-  drift: boolean; snippet: SnippetAnchor; block?: ContentBlock; citedText?: string; currentBlock?: ContentBlock; note?: string;
+  drift: boolean; koId: string; snippet: SnippetAnchor; block?: ContentBlock; citedText?: string; currentBlock?: ContentBlock; note?: string;
 }
 export interface CiteResult {
   koId: string; mode: 'entity' | 'version' | 'doi'; asOf: string; authors: string[]; title: string;

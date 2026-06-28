@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { LensPatch, LensState } from '../../core/lens/lens-url';
 
 export interface VersionEntry { _id: string; status: string; createdAt: string; doi?: string | null }
@@ -20,6 +20,23 @@ interface Props {
  */
 export function LensBar({ lens, setLens, versions, currentVersionId, tipId, vorId, onSelectVersion }: Props) {
   const [verOpen, setVerOpen] = useState(false);
+  const verRef = useRef<HTMLDivElement>(null);
+  // Close the version popover on Escape or any click outside it. Capture phase is
+  // required because the lens bar stops mousedown propagation (so a bubble-phase
+  // document listener would never see in-bar clicks). (a11y: keyboard/touch dismiss.)
+  useEffect(() => {
+    if (!verOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (verRef.current && !verRef.current.contains(e.target as Node)) setVerOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setVerOpen(false); };
+    document.addEventListener('mousedown', onDown, true);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown, true);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [verOpen]);
   const label = (id: string) => {
     const i = versions.findIndex((v) => v._id === id);
     return i >= 0 ? `v${i + 1}` : 'version';
@@ -34,14 +51,14 @@ export function LensBar({ lens, setLens, versions, currentVersionId, tipId, vorI
         {/* Version */}
         <div className="jose-lens">
           <span className="jose-lens-label">⟲ Version</span>
-          <div className="jose-verbtn">
-            <button className="jose-chip" onClick={() => setVerOpen((o) => !o)} aria-expanded={verOpen}>
+          <div className="jose-verbtn" ref={verRef}>
+            <button className="jose-chip" onClick={() => setVerOpen((o) => !o)} aria-expanded={verOpen} aria-haspopup="true">
               {label(currentVersionId)} · <span className="mono">{cur?.createdAt ?? ''}</span> ▾
               {isVor && <span style={{ color: 'var(--verified)', fontWeight: 600, fontSize: 11 }}> ⚐ VoR</span>}
               {isTip && <span style={{ color: 'var(--ink)', fontWeight: 600, fontSize: 11 }}> tip</span>}
             </button>
             {verOpen && (
-              <div className="jose-pop" onMouseLeave={() => setVerOpen(false)}>
+              <div className="jose-pop">
                 <h4>Version history</h4>
                 {versions.map((v) => {
                   const vIsTip = v._id === tipId;

@@ -86,8 +86,8 @@
 .lb-zonelegend .k .sw.metered { background: var(--haze); border: 1px solid var(--rule); }
 
 /* the prominent free-verification statement (the AC 11.8 principle) */
-.lb-freecard { border-color: var(--type-red); background: #fdf3f1; }
-.lb-freecard h3 { color: var(--type-red); }
+.lb-freecard { border-color: var(--type-red); background: var(--type-red-wash); }
+.lb-freecard h2, .lb-freecard h3 { color: var(--type-red); }
 .lb-freecard p { font-size: 13px; color: var(--ink); margin: 0; line-height: 1.5; }
 .lb-freecard .em { color: var(--type-red); font-weight: 600; }
 
@@ -116,3 +116,12 @@
 .lb-kv .k { color: var(--structure); }
 .lb-kv .v { color: var(--ink); font-family: var(--mono); font-size: 11.5px; text-align: right; }
 .lb-kv .v.free { color: var(--type-red); }
+
+/* in-Reader lightbox modal (FE1 × FE7) — opens over the reading frame */
+.lb-modal-back { position: fixed; inset: 0; z-index: 90; background: rgba(20, 28, 22, 0.5); display: flex; align-items: flex-start; justify-content: center; padding: 5vh 16px; overflow: auto; }
+.lb-modal { width: min(1100px, 96vw); background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; box-shadow: 0 24px 64px rgba(20, 28, 22, 0.4); padding: 16px 20px 24px; }
+.lb-modal-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.lb-modal-head .spacer { margin-left: auto; }
+.lb-modal-cap { font-family: var(--body); font-size: 15px; color: var(--ink); }
+.lb-modal-close { border: 0; background: transparent; font-size: 24px; line-height: 1; color: var(--structure); cursor: pointer; padding: 0 4px; }
+.lb-modal-close:hover { color: var(--ink); }

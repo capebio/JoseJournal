@@ -74,7 +74,7 @@ export function Discovery() {
 
       {/* Anchor row */}
       <div className="jose-card">
-        <h3>Anchor</h3>
+        <h2>Anchor</h2>
         <div className="disc-anchor">
           <div className="disc-searchbox">
             <span className="ic" aria-hidden>⌕</span>
@@ -103,7 +103,7 @@ export function Discovery() {
 
       {/* Filters */}
       <div className="jose-card">
-        <h3>Filters</h3>
+        <h2>Filters</h2>
         <div className="disc-filters">
           <div className="jose-field">
             <label htmlFor="disc-tier">Tier</label>
@@ -160,7 +160,8 @@ export function Discovery() {
       ) : searchQ.isError ? (
         <div className="disc-err">
           <b>Search failed</b>
-          {(searchQ.error as Error)?.message ?? 'The search could not be completed.'}
+          We couldn’t complete that search. Check your connection and try again, or adjust your filters.
+          <button className="jose-btn" style={{ marginTop: 10 }} onClick={() => searchQ.refetch()}>Try again</button>
         </div>
       ) : searchQ.isLoading ? (
         <div className="jose-loading">Searching the graph…</div>

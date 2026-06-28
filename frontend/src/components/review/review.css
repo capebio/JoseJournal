@@ -14,8 +14,8 @@
 .jose-rev .act .seg { display: inline-flex; gap: 4px; margin-bottom: 7px; flex-wrap: wrap; }
 .jose-rev .act .seg button { font-family: var(--ui); font-size: 9.5px; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid var(--rule); background: #fff; color: var(--sub); border-radius: 5px; padding: 3px 8px; cursor: pointer; }
 .jose-rev .act .seg button.on.green { background: var(--verified); color: #fff; border-color: var(--verified); }
-.jose-rev .act .seg button.on.yellow { background: #b8a93e; color: #fff; border-color: #b8a93e; }
-.jose-rev .act .seg button.on.orange { background: #c8772a; color: #fff; border-color: #c8772a; }
+.jose-rev .act .seg button.on.yellow { background: #b8a93e; color: var(--on-warn-ink); border-color: #b8a93e; }
+.jose-rev .act .seg button.on.orange { background: #c8772a; color: var(--on-warn-ink); border-color: #c8772a; }
 .jose-rev .act .seg button.on.red { background: var(--type-red); color: #fff; border-color: var(--type-red); }
 .jose-rev .act .arow { display: flex; gap: 8px; align-items: center; margin-top: 7px; }
 
@@ -32,7 +32,7 @@
 .jose-coauthor .cstate.declined { background: var(--haze); border-color: var(--rule); color: var(--sub); text-decoration: line-through; }
 .jose-coauthor .cstate.negotiating { background: #f8f6e8; border-color: #b8a93e; color: #8a7d24; }
 /* named-unconfirmed MUST read as provisional, never as confirmed — type-red marker (§3 annotation) */
-.jose-coauthor .cstate.named-unconfirmed { background: #fdf3f1; border-color: var(--type-red); color: var(--type-red); }
+.jose-coauthor .cstate.named-unconfirmed { background: var(--type-red-wash); border-color: var(--type-red); color: var(--type-red); }
 .jose-coauthor .resp { margin-left: auto; display: flex; gap: 5px; }
 .jose-coauthor .resp button { font-family: var(--ui); font-size: 10.5px; border: 1px solid var(--rule); background: #fff; color: var(--ink); border-radius: 6px; padding: 4px 9px; cursor: pointer; }
 
@@ -53,8 +53,8 @@
 .rr-check { display: flex; gap: 9px; align-items: flex-start; font-family: var(--ui); font-size: 12.5px; color: var(--ink); padding: 8px 0; border-top: 1px solid var(--haze); }
 .rr-check .mk { flex: none; width: 16px; font-weight: 700; }
 .rr-check.ok .mk { color: var(--verified); }
-.rr-check.no .mk { color: #c8772a; }
-.rr-check.warn .mk { color: #c9a23a; }
+.rr-check.no .mk { color: var(--caution); }
+.rr-check.warn .mk { color: var(--caution); }
 .rr-btn { width: 100%; font-family: var(--ui); font-size: 13.5px; font-weight: 600; border: 0; border-radius: 9px; padding: 12px; margin-top: 14px; background: var(--verified); color: #fff; cursor: pointer; }
 .rr-btn:disabled { background: var(--haze); color: var(--structure); cursor: not-allowed; }
 .rr-note { font-family: var(--ui); font-size: 11px; color: var(--structure); text-align: center; margin-top: 8px; }

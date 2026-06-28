@@ -125,7 +125,7 @@ export function ReviewPanel() {
       <div className="jose-revpanel">
         {/* ── threads ─────────────────────────────────────────────────── */}
         <div>
-          <div className="jose-h">Reviewer dispositions</div>
+          <h2 className="jose-h">Reviewer dispositions</h2>
           {reviews.length === 0 ? (
             <div className="jose-revempty">No reviews yet. {canManage ? 'Nominate a reviewer to begin.' : ''}</div>
           ) : (
@@ -143,7 +143,7 @@ export function ReviewPanel() {
 
           {isReviewer && (
             <div className="jose-card" style={{ marginTop: 16 }}>
-              <h3>Open a new thread</h3>
+              <h2>Open a new thread</h2>
               <p className="jose-revhint">As a reviewer you can also start a thread directly on the object.</p>
               <NewThread onSubmit={submitReview} />
             </div>
@@ -154,7 +154,7 @@ export function ReviewPanel() {
         <div>
           {canManage && (
             <div className="jose-card">
-              <h3>Reviewers</h3>
+              <h2>Reviewers</h2>
               <NominateReviewer onNominate={nominate} />
             </div>
           )}

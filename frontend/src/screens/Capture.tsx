@@ -85,8 +85,8 @@ export function Capture() {
         <OfflineBadge />
       </div>
 
-      <div className="jose-card">
-        <h3>Field record</h3>
+      <form className="jose-card" onSubmit={(e) => { e.preventDefault(); if (canSave) onSave(); }}>
+        <h2>Field record</h2>
 
         <button
           type="button"
@@ -178,7 +178,7 @@ export function Capture() {
         </div>
 
         <div className="jose-row">
-          <button className="jose-btn primary" onClick={onSave} disabled={!canSave}>
+          <button type="submit" className="jose-btn primary" disabled={!canSave}>
             {submitting ? 'Saving…' : 'Save observation'}
           </button>
           {!verifiedPlus && (
@@ -195,11 +195,11 @@ export function Capture() {
             ? 'Online — saves go straight to the server.'
             : '● Offline — will sync. Your capture is held locally and queued; the smallest citable knowledge object works offline.'}
         </p>
-      </div>
+      </form>
 
       {saved && (
         <div className="jose-card cap-receipt" role="status" aria-live="polite">
-          <h3>Saved — server projection</h3>
+          <h2>Saved — server projection</h2>
           <div className="rrow">
             <div className="rk">observation id</div>
             <div className="rv">{saved.obsId}</div>

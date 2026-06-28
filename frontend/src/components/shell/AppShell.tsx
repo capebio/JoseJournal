@@ -11,6 +11,7 @@ const NAV = [
   { to: '/map', label: 'Distribution', ic: '◰' },
   { to: '/capture', label: 'Capture', ic: '✛' },
   { to: '/profile', label: 'Profile', ic: '◐' },
+  { to: '/first-edition', label: 'First Edition', ic: '◆' },
 ];
 
 /** App shell: left nav + account chip (dev-login switcher) + offline badge (§2, §8). */
@@ -31,7 +32,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </NavLink>
           ))}
           <div className="shell-acct">
-            {!online && <div style={{ color: '#c8772a', fontSize: 11, marginBottom: 6 }}>● offline — public cache</div>}
+            {!online && <div style={{ color: 'var(--caution)', fontSize: 11, marginBottom: 6 }}>● offline — public cache</div>}
             {principal ? (
               <>
                 <div>{principal.accountId.replace('acct:', '')}</div>

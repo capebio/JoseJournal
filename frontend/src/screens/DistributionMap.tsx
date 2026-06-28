@@ -115,7 +115,7 @@ export function DistributionMap() {
       setRejectId(null); setRejectText('');
       mapQ.refetch();
     } catch (e) {
-      flash((e as { status?: number })?.status === 403 ? 'Not permitted — needs curator role' : 'Decision failed');
+      flash((e as { status?: number })?.status === 403 ? 'Not permitted — needs a curator role (author/editor/steward)' : 'Decision failed — check your connection and retry');
     }
   };
 
@@ -138,7 +138,7 @@ export function DistributionMap() {
         const res = any ? await ep.getPrecise(any._id.replace(':public', ''), purpose) : { status: 403 };
         flash(res.status === 200 ? 'Access served' : 'Access required — no active grant; ask an editor');
       }
-    } catch { flash('Precise request failed'); }
+    } catch { flash('Precise request failed — check your connection and retry'); }
   };
   const revoke = () => { setGranted(false); setPrecision('qds'); setPrecise({}); };
 
@@ -153,13 +153,13 @@ export function DistributionMap() {
 
   const gridStep = precision === 'half' ? 0.5 : 0.25;
   const gridLines: React.ReactNode[] = [];
-  for (let lon = view.lonLo; lon <= view.lonHi + 1e-9; lon += gridStep) gridLines.push(<line key={'v' + lon} x1={projX(lon)} y1={0} x2={projX(lon)} y2={H} stroke="#D9DED6" strokeWidth={Math.abs(lon % 1) < 1e-9 ? 1 : 0.5} />);
-  for (let lat = view.latLo; lat <= view.latHi + 1e-9; lat += gridStep) gridLines.push(<line key={'h' + lat} x1={0} y1={projY(lat)} x2={W} y2={projY(lat)} stroke="#D9DED6" strokeWidth={Math.abs(lat % 1) < 1e-9 ? 1 : 0.5} />);
+  for (let lon = view.lonLo; lon <= view.lonHi + 1e-9; lon += gridStep) gridLines.push(<line key={'v' + lon} x1={projX(lon)} y1={0} x2={projX(lon)} y2={H} style={{ stroke: 'var(--rule)' }} strokeWidth={Math.abs(lon % 1) < 1e-9 ? 1 : 0.5} />);
+  for (let lat = view.latLo; lat <= view.latHi + 1e-9; lat += gridStep) gridLines.push(<line key={'h' + lat} x1={0} y1={projY(lat)} x2={W} y2={projY(lat)} style={{ stroke: 'var(--rule)' }} strokeWidth={Math.abs(lat % 1) < 1e-9 ? 1 : 0.5} />);
 
   return (
     <div>
       <div className="mp-head">
-        <div className="mp-h-title">Distribution · <i>Mesembryanthemum aureum</i></div>
+        <div className="mp-h-title">Distribution · {seed && koId === seed.koId && seed.name ? <i>{seed.name}</i> : <span className="jose-mono">{koId}</span>}</div>
         <span className="mp-prec">precision
           <span className="mp-seg" role="group" aria-label="Precision">
             <button aria-pressed={precision === 'half'} onClick={() => setPrecision('half')}>Half°</button>
@@ -176,21 +176,35 @@ export function DistributionMap() {
             <svg ref={svgRef} width={W} height={H} viewBox={`0 0 ${W} ${H}`} onMouseMove={onMove} onMouseLeave={() => setHover(null)} style={{ display: 'block', maxWidth: '100%' }} role="img" aria-label="QDS distribution map">
               <rect x={0} y={0} width={W} height={H} fill="#fbfcfa" />
               {gridLines}
+              {cells.length === 0 && pending.length === 0 && (
+                <text x={W / 2} y={H / 2} fontFamily="Inter Tight, sans-serif" fontSize={13} textAnchor="middle" dominantBaseline="middle" style={{ fill: 'var(--structure)' }}>
+                  No recorded localities for this object yet.
+                </text>
+              )}
               {!exact && cells.map((c) => {
                 const x = projX(c.b.lonLo), y = projY(c.b.latHi), w = projX(c.b.lonHi) - projX(c.b.lonLo), h = projY(c.b.latLo) - projY(c.b.latHi);
                 const on = selCode === c.key;
                 return (
-                  <g key={c.key} className="mp-cell" onClick={() => setSelCode(c.key)}>
-                    <rect x={x} y={y} width={w} height={h} fill="#2E6E5E" fillOpacity={on ? 0.34 : 0.2} stroke="#2E6E5E" strokeOpacity={on ? 0.9 : 0.5} />
-                    <text x={x + w / 2} y={y + h / 2} fontFamily="IBM Plex Mono, monospace" fontSize={12} fill="#2E6E5E" textAnchor="middle" dominantBaseline="middle">{c.n}</text>
+                  <g
+                    key={c.key}
+                    className="mp-cell"
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`QDS cell ${c.codes[0]}, ${c.n} observation${c.n === 1 ? '' : 's'}`}
+                    aria-pressed={on}
+                    onClick={() => setSelCode(c.key)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelCode(c.key); } }}
+                  >
+                    <rect x={x} y={y} width={w} height={h} style={{ fill: 'var(--verified)', stroke: 'var(--verified)' }} fillOpacity={on ? 0.34 : 0.2} strokeOpacity={on ? 0.9 : 0.5} />
+                    <text x={x + w / 2} y={y + h / 2} fontFamily="IBM Plex Mono, monospace" fontSize={12} style={{ fill: 'var(--verified)' }} textAnchor="middle" dominantBaseline="middle">{c.n}</text>
                   </g>
                 );
               })}
               {exact && Object.values(precise).map((p, i) => (
-                <g key={i}><circle cx={projX(p.lon)} cy={projY(p.lat)} r={4.5} fill="#A83A2C" /><circle cx={projX(p.lon)} cy={projY(p.lat)} r={9} fill="none" stroke="#A83A2C" strokeOpacity={0.4} /></g>
+                <g key={i}><circle cx={projX(p.lon)} cy={projY(p.lat)} r={4.5} style={{ fill: 'var(--type-red)' }} /><circle cx={projX(p.lon)} cy={projY(p.lat)} r={9} fill="none" style={{ stroke: 'var(--type-red)' }} strokeOpacity={0.4} /></g>
               ))}
               {pending.map((o) => { const c = centre(ringBounds(o.geometryGeneralised.coordinates[0])); const cx = projX(c.lon), cy = projY(c.lat);
-                return <rect key={o._id} x={cx - 5} y={cy - 5} width={10} height={10} fill="none" stroke="#C9A23A" strokeWidth={2} transform={`rotate(45 ${cx} ${cy})`} />; })}
+                return <rect key={o._id} x={cx - 5} y={cy - 5} width={10} height={10} fill="none" style={{ stroke: 'var(--caution)' }} strokeWidth={2} transform={`rotate(45 ${cx} ${cy})`} />; })}
             </svg>
           </div>
 
@@ -201,9 +215,9 @@ export function DistributionMap() {
           </div>
 
           <div className="mp-legend">
-            <span><i style={{ background: '#2E6E5E', opacity: 0.4 }} />accepted (obfuscated cell)</span>
-            <span><i style={{ background: 'transparent', border: '2px solid #C9A23A' }} />pending</span>
-            <span><i style={{ background: '#A83A2C' }} />exact point (granted)</span>
+            <span><i style={{ background: 'var(--verified)', opacity: 0.4 }} />accepted (obfuscated cell)</span>
+            <span><i style={{ background: 'transparent', border: '2px solid var(--caution)' }} />pending</span>
+            <span><i style={{ background: 'var(--type-red)' }} />exact point (granted)</span>
           </div>
 
           <div className="mp-about">

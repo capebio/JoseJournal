@@ -9,7 +9,7 @@ export function IdentityHeader({ principal }: { principal: Principal | null }) {
   if (!principal) {
     return (
       <div className="jose-card jp-identity">
-        <h3>Your account</h3>
+        <h2>Your account</h2>
         <p className="jp-prompt">
           Not signed in. Use the dev sign-in in the left nav (or app bar) to assume a
           seeded actor — author, editor, reviewer, or guest reader — then return here.
@@ -27,7 +27,7 @@ export function IdentityHeader({ principal }: { principal: Principal | null }) {
 
   return (
     <div className="jose-card jp-identity">
-      <h3>Your account</h3>
+      <h2>Your account</h2>
       <div className="jp-id-row">
         <div className={`jp-avatar a-${principal.assurance}`} aria-hidden>{initials}</div>
         <div className="jp-id-body">

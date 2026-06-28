@@ -44,7 +44,7 @@
 .jp-cert-note.ok { font-size: 13px; color: var(--verified); margin: 0; }
 .jp-cert-applied { margin-top: 12px; display: flex; flex-direction: column; gap: 7px; align-items: flex-start; }
 .jp-cert-idlabel { font-size: 11px; color: var(--structure); }
-.jp-cert-id, .jp-record-id { color: var(--type-red); background: #fdf3f1; border: 1px solid #f0d4cf; border-radius: 5px; padding: 3px 8px; word-break: break-all; }
+.jp-cert-id, .jp-record-id { color: var(--type-red); background: var(--type-red-wash); border: 1px solid #f0d4cf; border-radius: 5px; padding: 3px 8px; word-break: break-all; }
 .jp-vouch-progress { display: inline-flex; align-items: center; gap: 7px; margin-top: 4px; }
 .jp-vouch-progress .dot { width: 11px; height: 11px; border-radius: 50%; border: 2px solid var(--rule); }
 .jp-vouch-progress .dot.on { background: var(--verified); border-color: var(--verified); }

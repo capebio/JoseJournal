@@ -5,13 +5,27 @@
   --paper: #f6f8f5;
   --ink: #18201b;
   --sub: #4a5650;
-  --structure: #6e7c70;
+  /* --structure darkened to ~4.6:1 on --paper so small label/placeholder text meets WCAG AA (was #6e7c70 ≈ 4.11:1). */
+  --structure: #69736a;
   --rule: #d9ded6;
   --type-red: #a83a2c;
   --verified: #2e6e5e;
   --haze: #ecefe9;
   --ai: #bcd4e2;
   --aih: #cfe0d6;
+  /* AI-surface companions to --ai/--aih (foreground ink, border, block tints). */
+  --ai-ink: #1c4a63;
+  --ai-border: #9cc1d6;
+  --ai-bg: #eef4f8;
+  --aih-bg: #eef5ef;
+  /* Darker amber for small caution TEXT/icons (≈5.5:1 on white); the brighter amber backgrounds stay as fills. */
+  --caution: #9a5a16;
+  /* Ink used on light caution/disposition chips so the verdict text stays legible. */
+  --on-warn-ink: #2a2305;
+  /* The single light type-red wash (was two near-duplicates #fdf3f1 / #fdf6f5). */
+  --type-red-wash: #fdf3f1;
+  /* Shared herbarium figure-placeholder texture (was duplicated verbatim in two files). */
+  --figbox: repeating-linear-gradient(135deg, #eef1ec, #eef1ec 9px, #e7ebe5 9px, #e7ebe5 18px);
   --ui: 'Inter Tight', system-ui, sans-serif;
   --body: 'Spectral', Georgia, serif;
   --mono: 'IBM Plex Mono', ui-monospace, monospace;

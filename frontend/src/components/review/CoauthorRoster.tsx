@@ -35,7 +35,7 @@ export function CoauthorRoster({ coauthors, canAdd, selfAccountId, onAdd, onResp
 
   return (
     <div className="jose-card">
-      <h3>Co-authors</h3>
+      <h2>Co-authors</h2>
       {coauthors.length === 0 && <div className="jose-revempty">No co-authors named yet.</div>}
 
       {coauthors.map((c) => {

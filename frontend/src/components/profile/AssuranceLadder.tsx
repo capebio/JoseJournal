@@ -32,7 +32,7 @@ export function AssuranceLadder({ current }: { current: Assurance }) {
   const currentIdx = ORDER[current];
   return (
     <div className="jose-card jp-ladder">
-      <h3>Assurance ladder</h3>
+      <h2>Assurance ladder</h2>
       <p className="jp-ladder-lede">
         Standing is earned by deeds, not declared. You climb as your work is checked and vetted.
       </p>

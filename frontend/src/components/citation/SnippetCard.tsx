@@ -23,11 +23,11 @@ export function SnippetCard({
   view: View;
   onView: (v: View) => void;
 }) {
-  const { drift, snippet, block, citedText, currentBlock, note } = resolution;
+  const { drift, koId, snippet, block, citedText, currentBlock, note } = resolution;
   // What was cited (anchored) vs. what the treatment currently shows.
   const cited = citedText ?? block?.text ?? snippet.quotedText ?? '';
   const current = currentBlock?.text ?? '';
-  const treatmentHref = `/ko/${encodeURIComponent('—')}/v/${encodeURIComponent(snippet.versionId)}`;
+  const treatmentHref = `/ko/${encodeURIComponent(koId)}/v/${encodeURIComponent(snippet.versionId)}`;
 
   return (
     <div className="jose-card jose-snip">
@@ -70,7 +70,7 @@ export function SnippetCard({
           </p>
           <Link to={treatmentHref} className="jose-btn">Open treatment at this version →</Link>
           <p className="jose-snip-hint">
-            The version id is the durable handle; the knowledge-object id is resolved by the reader.
+            The immutable version id is the durable handle — opening it pins the treatment to exactly this state.
           </p>
         </div>
       ) : drift ? (

@@ -45,5 +45,5 @@
 .disc-taxon { font-style: italic; }
 
 .disc-empty { border: 1px dashed var(--rule); border-radius: 10px; padding: 40px 20px; text-align: center; color: var(--structure); font-family: var(--ui); font-size: 13px; }
-.disc-err { border: 1px solid var(--type-red); background: #fdf3f1; border-radius: 10px; padding: 16px 18px; color: var(--type-red); font-family: var(--ui); font-size: 13px; }
+.disc-err { border: 1px solid var(--type-red); background: var(--type-red-wash); border-radius: 10px; padding: 16px 18px; color: var(--type-red); font-family: var(--ui); font-size: 13px; }
 .disc-err b { display: block; margin-bottom: 4px; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
