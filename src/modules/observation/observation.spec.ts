@@ -91,7 +91,7 @@ describe('§9.2/§9.5 Observation / micro-observations', () => {
     const stored = (await ko.getPublicProjection(`${obsId}:public`)) as unknown as ObservationPublic;
     const json = JSON.stringify(stored);
 
-    expect(stored.localityQDS).toMatch(/^\d{4}[A-D]{2}$/);
+    expect(stored.localityQDS).toMatch(/^[NS]\d{2}[EW]\d{3}[A-D]{2}$/);
     expect(json).not.toContain('33.9249');
     expect(json).not.toContain('18.4241');
     expect(json).not.toContain('"lat"');

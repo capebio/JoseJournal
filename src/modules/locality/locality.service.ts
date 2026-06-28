@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PORTS, type AuditRepo, type KnowledgeObjectRepo, type LocalityRepo } from '@core/ports';
 import type { AccessGrant, ObservationPublic, Principal } from '@core/types';
 import { mintId } from '@core/ids';
-import { encodeQDS, qdsPolygon } from '@core/qds';
+import { qdsCell, qdsPolygon } from '@core/qds';
 import { ProvenanceService } from '@modules/provenance/provenance.service';
 
 export interface SplitStoreInput {
@@ -61,7 +61,7 @@ export class LocalityService {
       }
     }
     const obsId = mintId('obs');
-    const qds = encodeQDS(input.lat, input.lon); // throws (rejects) rather than under-generalise
+    const qds = qdsCell(input.lat, input.lon); // §8 QDS (depth 2), hemisphere-aware — the public floor
     const publicDoc: ObservationPublic = {
       _id: `${obsId}:public`,
       '@type': 'ObservationPublic',

@@ -73,6 +73,20 @@ describe('§9.1 Versioning core (spike gate)', () => {
     expect(release.versionId).toBe(vor._id);
   });
 
+  it('amending the tip after a release does NOT move the frozen VoR pointer (M0 acceptance)', async () => {
+    const { entity, version } = await ko.createKo({ koType: 'treatment', tier: 'commons', content: sampleContent(), visibility: 'public', actor: ACTOR });
+    const { version: vor } = await versioning.tagVoR(entity._id, version._id, { ref: 'acct:editor', role: 'editor' });
+
+    // After release the tip IS the vor version; amend it with no explicit status.
+    const v3 = await versioning.amend({ koId: entity._id, baseVersionId: vor._id, content: sampleContent('post-release edit'), actor: ACTOR, amendClass: 'substantive' });
+
+    const e = await repo.getEntity(entity._id);
+    expect(e!.refs.tip).toBe(v3._id); // tip moves forward
+    expect(e!.refs.vor).toBe(vor._id); // VoR pointer is UNCHANGED (the bug was it followed the tip)
+    expect(v3.status).not.toBe('vor'); // the amended version is not a second, DOI-less "vor"
+    expect(v3.doi).toBeNull();
+  });
+
   it('identical content committed twice yields the same ver id (dedup)', async () => {
     const { entity, version } = await ko.createKo({ koType: 'treatment', content: sampleContent('dup'), actor: ACTOR });
     // commit identical content+meta again

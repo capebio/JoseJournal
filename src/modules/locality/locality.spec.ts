@@ -38,7 +38,7 @@ describe('§9.5 Locality / anti-poaching', () => {
   it('the public projection contains no coordinate finer than QDS', async () => {
     const { public: pub } = await storeSensitive();
     const json = JSON.stringify(pub);
-    expect(pub.localityQDS).toMatch(/^\d{4}[A-D]{2}$/);
+    expect(pub.localityQDS).toMatch(/^[NS]\d{2}[EW]\d{3}[A-D]{2}$/);
     // The precise decimals must appear nowhere in the public doc.
     expect(json).not.toContain('33.9249');
     expect(json).not.toContain('18.4241');

@@ -1,6 +1,6 @@
 import { canonicalize } from './canonical';
 import { computeVersionHash, sha256Hex } from './hash';
-import { encodeQDS, qdsBounds, qdsPolygon } from './qds';
+import { qdsBounds, qdsCell, qdsPolygon } from './qds';
 import type { KnowledgeObjectContent, VersionMeta } from './types';
 
 describe('RFC 8785 JCS canonicalization', () => {
@@ -40,28 +40,29 @@ describe('content hashing', () => {
   });
 });
 
-describe('QDS grid (anti-poaching generalisation)', () => {
-  it('encodes a southern/eastern point to a 4-digit + 2-letter code', () => {
-    const code = encodeQDS(-33.9249, 18.4241);
-    expect(code).toMatch(/^\d{4}[A-D]{2}$/);
-    expect(code.startsWith('3318')).toBe(true);
+describe('QDS grid (SPEC §8 — hemisphere-aware, anti-poaching)', () => {
+  it('encodes the verified Cape Town vector to S33E018CD', () => {
+    expect(qdsCell(-33.9249, 18.4241)).toBe('S33E018CD');
   });
-  it('rejects northern/western coordinates rather than under-generalising', () => {
-    expect(() => encodeQDS(10, 18)).toThrow();
-    expect(() => encodeQDS(-33, -18)).toThrow();
+  it('supports N/W (verified London vector) rather than rejecting it', () => {
+    expect(qdsCell(51.5074, -0.1278)).toBe('N51W000BD');
+  });
+  it('rejects out-of-range / non-finite coordinates', () => {
+    expect(() => qdsCell(200, 18)).toThrow();
+    expect(() => qdsCell(-33, Infinity)).toThrow();
   });
   it('the precise point lies within its QDS cell bounds', () => {
-    const code = encodeQDS(-33.9249, 18.4241);
+    const code = qdsCell(-33.9249, 18.4241);
     const b = qdsBounds(code);
-    expect(-33.9249).toBeLessThanOrEqual(b.north);
     expect(-33.9249).toBeGreaterThanOrEqual(b.south);
+    expect(-33.9249).toBeLessThanOrEqual(b.north);
     expect(18.4241).toBeGreaterThanOrEqual(b.west);
     expect(18.4241).toBeLessThanOrEqual(b.east);
     const poly = qdsPolygon(code);
     expect(poly.coordinates[0].length).toBe(5); // closed ring
   });
-  it('a QDS cell is at most a quarter degree on each side', () => {
-    const b = qdsBounds(encodeQDS(-33.9249, 18.4241));
+  it('a QDS cell is a quarter degree on each side', () => {
+    const b = qdsBounds(qdsCell(-33.9249, 18.4241));
     expect(b.north - b.south).toBeCloseTo(0.25, 6);
     expect(b.east - b.west).toBeCloseTo(0.25, 6);
   });

@@ -1,89 +1,100 @@
 /**
- * Quarter-Degree Square (QDS / QDGC) grid — the southern-African standard used
- * across Casabio. A QDS code (~0.25°, roughly 25km) is the FINEST locality that
- * may ever appear in a public projection (§3.7, §6). Precise lat/lon lives only
- * in the restricted Postgres table.
+ * QDS — the locality primitive (SPEC-RECONCILED §8). A hemisphere-aware recursive
+ * quad-tree, verified against Casabio's Southern-African convention. The QDS code
+ * (~0.25°, depth 2, roughly 25 km) is the FINEST locality that may appear in a
+ * public projection (§6); precise lat/lon lives only in the restricted store.
  *
- * Code form, e.g. "2318CA":
- *   "23"  degrees latitude  (south, absolute)
- *   "18"  degrees longitude (east,  absolute)
- *   "C"   half-degree quadrant of the 1° cell   (A=NW B=NE C=SW D=SE)
- *   "A"   quarter-degree quadrant of that cell   (A=NW B=NE C=SW D=SE)
+ * Code form:  {S|N}{deg2}{E|W}{deg3}{letters}      e.g. "S33E018CD"
+ *   Quadrants: A=NW  B=NE  C=SW  D=SE   (recursive, to any depth)
+ *   Depth:     0 = degree cell · 1 = half-degree (1 letter) · 2 = QDS (2 letters) · n = n letters
  *
- * v1 assumes the JOSE/Casabio working region: southern latitudes, eastern
- * longitudes (lat ≤ 0, lon ≥ 0). encodeQDS rejects anything else so a sign
- * mistake can never silently mis-place — or worse, under-generalise — a point.
+ * Verified vectors: Cape Town (−33.92, 18.42) → "S33E018CD"; London (51.50, −0.12) → "N51W000BD".
+ *
+ * Implement ONCE, server-side, identically to the client primitive.
  */
 
-const QUAD = ['A', 'B', 'C', 'D'] as const; // index by (south?1:0)*2 + (east?1:0)
+/** Public obfuscation cap (quarter-degree square). Public clients never see finer. */
+export const QDS_PUBLIC_DEPTH = 2;
 
-function quadrant(fracLat: number, fracLon: number, cell: number): { letter: string; subLat: number; subLon: number } {
-  const half = cell / 2;
-  const south = fracLat >= half; // larger |lat| = further south
-  const east = fracLon >= half; // larger |lon| = further east
-  const letter = QUAD[(south ? 2 : 0) + (east ? 1 : 0)];
-  return {
-    letter,
-    subLat: fracLat - (south ? half : 0),
-    subLon: fracLon - (east ? half : 0),
-  };
+/**
+ * Degree-label edge convention.
+ *
+ * // DECISION: D8 — for the N and W hemispheres, which 1° edge does the degree
+ * number name? Default (and verified for S/E): floor(abs(deg)), i.e. the
+ * equatorward / Greenwich-ward edge. This is what makes London → "N51W000BD".
+ * The recursive quadrant letters (A/B/C/D) are NOT in question — only this edge.
+ * Change this one function once Casabio confirms the canonical N/W convention.
+ */
+function degreeLabel(deg: number, width: number, posChar: string, negChar: string): string {
+  const hemi = deg < 0 ? negChar : posChar;
+  return hemi + String(Math.floor(Math.abs(deg))).padStart(width, '0');
 }
 
-export function encodeQDS(lat: number, lon: number): string {
+/**
+ * Encode a precise point to its QDS code at `depth` (default 2 = the public QDS).
+ * Region-agnostic: works in all four hemispheres. `north = lat ≥ latMid`,
+ * `east = lon ≥ lonMid` (true N/E regardless of sign); append A=NW B=NE C=SW D=SE
+ * and recurse into the chosen sub-cell.
+ */
+export function qdsCell(lat: number, lon: number, depth: number = QDS_PUBLIC_DEPTH): string {
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
-    throw new Error('encodeQDS: lat/lon must be finite');
+    throw new Error('qdsCell: lat/lon must be finite');
   }
-  if (lat > 0 || lon < 0) {
-    throw new Error('encodeQDS: v1 supports the southern/eastern region (lat<=0, lon>=0)');
+  if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+    throw new Error('qdsCell: lat/lon out of range');
   }
-  const absLat = Math.abs(lat);
-  const absLon = Math.abs(lon);
-  const latDeg = Math.floor(absLat);
-  const lonDeg = Math.floor(absLon);
+  const d = Math.floor(depth);
+  if (d < 0) throw new Error('qdsCell: depth must be >= 0');
 
-  let fracLat = absLat - latDeg;
-  let fracLon = absLon - lonDeg;
-
-  const half = quadrant(fracLat, fracLon, 1.0);
-  fracLat = half.subLat;
-  fracLon = half.subLon;
-  const quarter = quadrant(fracLat, fracLon, 0.5);
-
-  const latStr = String(latDeg).padStart(2, '0');
-  const lonStr = String(lonDeg).padStart(2, '0');
-  return `${latStr}${lonStr}${half.letter}${quarter.letter}`;
+  // The signed 1° cell [floor(deg), floor(deg)+1).
+  let latLo = Math.floor(lat);
+  let lonLo = Math.floor(lon);
+  let size = 1;
+  let letters = '';
+  for (let i = 0; i < d; i++) {
+    size /= 2;
+    const latMid = latLo + size;
+    const lonMid = lonLo + size;
+    const north = lat >= latMid;
+    const east = lon >= lonMid;
+    letters += north ? (east ? 'B' : 'A') : east ? 'D' : 'C';
+    if (north) latLo = latMid;
+    if (east) lonLo = lonMid;
+  }
+  return degreeLabel(lat, 2, 'N', 'S') + degreeLabel(lon, 3, 'E', 'W') + letters;
 }
 
-/** Bounding box of a QDS cell, as {south,north,west,east} in signed degrees. */
+/**
+ * Legacy alias — the public QDS (depth 2). Retained so existing call sites keep
+ * working; new code should call qdsCell(lat, lon, depth) directly.
+ */
+export function encodeQDS(lat: number, lon: number): string {
+  return qdsCell(lat, lon, QDS_PUBLIC_DEPTH);
+}
+
+const QDS_RE = /^([NS])(\d{2})([EW])(\d{3})([A-D]*)$/;
+
+/** Bounding box of a QDS cell (any depth), as signed {south,north,west,east}. */
 export function qdsBounds(code: string): { south: number; north: number; west: number; east: number } {
-  const m = /^(\d{2})(\d{2})([A-D])([A-D])$/.exec(code);
+  const m = QDS_RE.exec(code);
   if (!m) throw new Error(`qdsBounds: malformed QDS code "${code}"`);
-  const latDeg = Number(m[1]);
-  const lonDeg = Number(m[2]);
-  const half = m[3];
-  const quarter = m[4];
-
-  let latOff = 0;
-  let lonOff = 0;
-  // half-degree quadrant within the 1° cell
-  if (half === 'C' || half === 'D') latOff += 0.5; // south half
-  if (half === 'B' || half === 'D') lonOff += 0.5; // east half
-  // quarter-degree quadrant within the 0.5° cell
-  if (quarter === 'C' || quarter === 'D') latOff += 0.25;
-  if (quarter === 'B' || quarter === 'D') lonOff += 0.25;
-
-  // absolute degrees; convert to signed (south negative, east positive)
-  const absNorth = latDeg + latOff; // smaller |lat| edge
-  const absSouth = latDeg + latOff + 0.25;
-  const west = lonDeg + lonOff;
-  const east = lonDeg + lonOff + 0.25;
-  return { north: -absNorth, south: -absSouth, west, east };
+  const [, latHemi, latNum, lonHemi, lonNum, letters] = m;
+  // Reconstruct the signed 1° base cell from the degree label (D8 edge convention).
+  let latLo = latHemi === 'N' ? Number(latNum) : -(Number(latNum) + 1);
+  let lonLo = lonHemi === 'E' ? Number(lonNum) : -(Number(lonNum) + 1);
+  let size = 1;
+  for (const L of letters) {
+    size /= 2;
+    if (L === 'A' || L === 'B') latLo += size; // north sub-cell
+    if (L === 'B' || L === 'D') lonLo += size; // east sub-cell
+  }
+  return { south: latLo, north: latLo + size, west: lonLo, east: lonLo + size };
 }
 
 /** Closed GeoJSON-style polygon ring for the QDS cell (the only geometry made public). */
 export function qdsPolygon(code: string): { type: 'Polygon'; coordinates: number[][][] } {
   const b = qdsBounds(code);
-  // [lon, lat] pairs, closed ring, counter-clockwise
+  // [lon, lat] pairs, closed ring.
   const ring: number[][] = [
     [b.west, b.south],
     [b.east, b.south],

@@ -114,11 +114,13 @@ export class VersioningService {
     return version;
   }
 
-  private async advanceRefs(entity: KnowledgeObjectEntity, branch: string, versionId: string, status: VersionStatus): Promise<void> {
+  private async advanceRefs(entity: KnowledgeObjectEntity, branch: string, versionId: string, _status: VersionStatus): Promise<void> {
     const fresh = (await this.ko.getEntity(entity._id))!;
     fresh.refs.branches[branch] = versionId;
     if (branch === 'main') fresh.refs.tip = versionId;
-    if (status === 'vor') fresh.refs.vor = versionId;
+    // The VoR pointer is moved ONLY by tagVoR (which mints the DOI atomically).
+    // A plain commit/amend must NEVER repoint refs.vor — otherwise amending the
+    // tip after a release silently moves the frozen, DOI-bearing VoR (§9.1).
     await this.ko.updateEntity(fresh);
   }
 
@@ -198,12 +200,18 @@ export class VersioningService {
     if (!entity) throw new NotFoundException(`unknown KO ${input.koId}`);
     const base = await this.ko.getVersion(input.baseVersionId);
     if (!base || base.ko !== input.koId) throw new NotFoundException(`unknown base version ${input.baseVersionId}`);
+    // Never inherit a TERMINAL status (vor/retracted). After a release the tip IS
+    // the vor version; amending it must produce a normal living version, not a
+    // second DOI-less "vor" (which would also have moved refs.vor before the
+    // advanceRefs fix). VoR is reachable only via tagVoR.
+    const inheritedStatus: VersionStatus =
+      base.status === 'vor' || base.status === 'retracted' ? 'verified' : base.status;
     const meta: VersionMeta = {
       ko: input.koId,
       parent: base._id,
       branch: 'main',
       authors: base.authors,
-      status: input.status ?? base.status,
+      status: input.status ?? inheritedStatus,
       visibility: base.visibility,
       lenses: base.lenses,
     };
@@ -233,9 +241,8 @@ export class VersioningService {
     const baseId = versionId ?? entity.refs.tip;
     const base = await this.ko.getVersion(baseId);
     if (!base) throw new NotFoundException(`unknown version ${baseId}`);
-    if (base.visibility !== 'public') {
-      // A VoR is public by definition; ensure the released content is publishable.
-    }
+    // A VoR is public by definition; the released version below is minted with
+    // visibility:'public' regardless of the base's visibility (release publishes).
 
     const vorMeta: VersionMeta = {
       ko: koId,
